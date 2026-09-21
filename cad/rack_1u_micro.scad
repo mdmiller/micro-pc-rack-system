@@ -12,7 +12,7 @@
 // =====================================================================
 
 /* [Part to render] */
-part = "tray_left"; // [tray_left,tray_right,keystone,front_lip,rear_stop,tie_plate,brick_bay,assembly]
+part = "tray_left"; // [tray_left,tray_right,keystone,front_lip,rear_stop,tie_plate,cable_floor,brick_bay,assembly]
 show_devices = true;
 
 /* [Rack + steel bracket] */
@@ -56,6 +56,17 @@ ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
 
+/* [Rear stop] */
+stop_h = 8;       // top of the stop face above the tray floor; the stop touches
+                  // only this band of the rear face, so any port layout clears it
+
+/* [Cable floor] */
+cf_y0   = 44;     // starts behind the keystone jack bodies
+cf_ext  = 16;     // overhang past the tray rear, into the gap between brick bays
+cf_t    = 3;
+ledge_w = 6;      // ledge on each inner wall that carries the cable floor
+ledge_h = 4;      // also the zip-tie clearance under the floor
+
 /* [Brick bay] */
 bb_front = 12;    // open plenum slot at the front of the module
 bb_depth = 90;
@@ -89,7 +100,6 @@ scr_y   = [panel_t+10, panel_t+24];
 tie_y   = [tray_d-22, tray_d-8];
 ret_y   = tray_d-6;
 ret_w   = 64;
-ret_h   = dev_h - pad_t;
 pad_y0  = tray_d-14;
 lip_h     = 5;                          // bar height across the opening
 lip_t     = 3;
@@ -101,6 +111,9 @@ lip_x0    = lip_scr_x[0] - lip_edge;
 lip_len   = seam_l - lip_x0;            // symmetric: same part fits either tray
 lip_scr_z = floor_t + lip_tab_h/2;
 bb_d    = bb_front + bb_depth + bb_rear;
+cf_w    = key_w - 0.6;
+cf_len  = tray_d + cf_ext - cf_y0;
+cf_scr_y = [54, 112, 170];          // clear of the keystone flange and tie plate
 
 module rr(w,h,r=2) { offset(r=r) square([w-2*r,h-2*r],center=true); }
 module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(len) children(); }
@@ -149,6 +162,7 @@ module tray_left() {
         cube([wall_i, tray_d-panel_t, wall_hi]);                         // inner wall
       translate([bay_cx-ret_w/2, pad_y0, floor_t])
         cube([ret_w, tray_d-pad_y0, pad_t]);                             // rear-stop pad
+      translate([seam_l, cf_y0, 0]) cube([ledge_w, tray_d-cf_y0, ledge_h]);// cable-floor ledge
     }
     yprism(bay_x0+bay_w/2, (open_z0+open_z1)/2, panel_t+2*eps)
       rr(bay_w, open_z1-open_z0, 2);                                     // PC face opening
@@ -164,6 +178,8 @@ module tray_left() {
       translate([bay_cx+dx, ret_y, 1]) cylinder(d=d_pilot, h=floor_t+pad_t);
     for (x=[wall_o/2, seam_l-wall_i/2])                                  // brick-bay pilots
       translate([x, tray_d-14, 20]) rotate([-90,0,0]) cylinder(d=d_pilot, h=15);
+    for (y=cf_scr_y)                                                     // cable floor
+      translate([seam_l+ledge_w/2, y, 0.4]) cylinder(d=d_pilot, h=ledge_h);
     floor_vents();
     inner_wall_vents();
   }
@@ -213,8 +229,8 @@ module front_lip() {
 // =====================================================================
 //  REAR STOP
 // =====================================================================
-module stop_profile() {
-  polygon([[0,0],[26,0],[26,pad_t],[4,pad_t],[4,ret_h+3.5],[-3.5,ret_h+3.5],[0,ret_h]]);
+module stop_profile() {             // a low curb: catches only the bottom edge
+  polygon([[0,0],[26,0],[26,pad_t],[5,pad_t],[5,stop_h-pad_t],[0,stop_h-pad_t]]);
 }
 module rear_stop() {
   difference() {
@@ -239,7 +255,21 @@ module tie_plate() {
 }
 
 // =====================================================================
-//  BRICK BAY MODULE  (one per side; the 40 mm centre gap is the cable run)
+//  CABLE FLOOR  (spans the centre channel on the two ledges; video leads
+//  run forward on it to the keystones, zip ties pass underneath)
+// =====================================================================
+module cable_floor() {
+  difference() {
+    cube([cf_w, cf_len, cf_t]);
+    for (x=[ledge_w/2-0.3, cf_w-ledge_w/2+0.3], y=cf_scr_y)
+      translate([x, y-cf_y0, -eps]) cylinder(d=d_free, h=cf_t+2*eps);
+    for (y=[20:30:cf_len-10], dx=[-8,8])                     // zip-tie slot pairs
+      translate([cf_w/2+dx, y, -eps]) linear_extrude(cf_t+2*eps) square([2.2,5],center=true);
+  }
+}
+
+// =====================================================================
+//  BRICK BAY MODULE  (one per side; the centre gap is the cable run)
 // =====================================================================
 module brick_bay() {
   difference() {
@@ -260,6 +290,11 @@ module brick_bay() {
     for (x=[wall_o/2, seam_l-wall_i/2])                      // tray bolt holes
       translate([x,-eps,20]) rotate([-90,0,0]) cylinder(d=d_free,h=6);
     translate([15, bb_d-bb_rear-eps, 3]) cube([30, bb_rear+2, bb_lip]); // cord notch
+    for (y=[30,60,90]) {                                     // zip-tie anchors: slot
+      for (x=[170,186])                                      // pairs, strap recessed
+        translate([x, y, -eps]) linear_extrude(floor_t+2) square([2.2,5],center=true);
+      translate([170, y-2.5, -eps]) cube([16, 5, 1.6]);      // in an underside groove
+    }
   }
 }
 
@@ -280,6 +315,7 @@ module assembly() {
   for (cx=[bay_cx, body_w-bay_cx])
     translate([cx-ret_w/2, panel_t+dev_d, floor_t+pad_t]) rear_stop();
   translate([seam_l-wall_i, tray_d-30, wall_hi]) tie_plate();
+  translate([seam_l+0.3, cf_y0, ledge_h]) cable_floor();
   translate([0,tray_d,0]) brick_bay();
   translate([body_w,tray_d,0]) mirror([1,0,0]) brick_bay();
   steel_ear(-brk_t,0); steel_ear(body_w+brk_t,1);
@@ -294,5 +330,6 @@ else if (part=="keystone")   translate([-seam_l+wall_i, panel_h, 0]) rotate([90,
 else if (part=="front_lip")  translate([0, lip_tab_h, 0]) rotate([90,0,0]) front_lip();  // flat, show face down
 else if (part=="rear_stop")  rear_stop();
 else if (part=="tie_plate")  tie_plate();
+else if (part=="cable_floor") cable_floor();
 else if (part=="brick_bay")  brick_bay();
 else                         assembly();

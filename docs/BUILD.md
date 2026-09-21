@@ -15,17 +15,18 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 
 | Part | Qty | Footprint |
 |---|---|---|
-| `tray_left` / `tray_right` | 1 each | 203 × 206 × 44 mm |
+| `tray_left` / `tray_right` | 1 each | 209 × 206 × 44 mm |
 | `brick_bay` | 2 | 203 × 110 × 32 mm |
 | `keystone` | 1 | 52 × 44 × 36 mm |
-| `rear_stop` | 2 | 64 × 30 × 37 mm |
+| `rear_stop` | 2 | 64 × 26 × 5 mm |
 | `front_lip` | 2 | 202 × 11 × 3 mm — symmetric, same part both sides |
 | `tie_plate` | 1 | 52 × 30 × 3 mm |
+| `cable_floor` | 1 | 35 × 178 × 3 mm |
 
-Also included: `rear_stop_lenovo_34.5mm.stl`, the Lenovo-height variant. Print one of
-each if you're running a Tiny alongside a Dell Micro.
+One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
+the rear face, so it doesn't care about case height or where the ports are.
 
-Largest part is 203 × 206 mm, so a 220 mm bed works with margin. Everything prints in
+Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Everything prints in
 the orientation it's exported in, no supports. Roughly 590 cm³ / 450 g of filament.
 
 **PETG, ASA or PC-blend — not PLA.** Root bending stress is only 0.73 MPa, so this is
@@ -45,6 +46,7 @@ about creep in a warm rack over months, not about strength.
 - 4 × M3 × 16 countersunk — tie plate
 - 4 × M3 × 10 pan — rear stops
 - 4 × M3 × 16 pan — brick bays to trays
+- 6 × M3 × 6 pan — cable floor to ledges
 - 4 × M3 × 8 pan head — front lips
 - All M3 threads directly into 2.7 mm printed pilots. No inserts anywhere.
 
@@ -52,6 +54,7 @@ about creep in a warm rack over months, not about strength.
 - 2 × keystone couplers, HDMI or DP female-female (mix freely, the apertures are identical)
 - 2 × short video cables, PC rear port to the back of the jack
 - 4 × velcro straps for the power bricks
+- Small zip ties (up to 4 mm wide) for the DC and video leads
 
 ## The ear bolts
 
@@ -72,14 +75,19 @@ nut can turn: hold it with a finger or a 7 mm spanner while you tighten.
    inside the bay, and bolt the steel ears on loosely.
 2. Drop the keystone module between the two tray fronts; screw its top flange into both
    inner walls. Fit the tie plate at the rear the same way.
-3. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
-4. Push the keystone couplers in from the front until they click.
-5. Rack it, then tighten the M4s once the depth looks right.
-6. Slide each PC in from the front. Set its rear stop so the hook catches the rear top
-   edge, then fit the front lip.
-7. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
-   centre. Strap them down. Route DC leads forward through the 36 mm centre gap; coil the
+3. Slide the cable floor in from the rear onto the two ledges between the trays and screw
+   it down (6 screws, all reachable from above).
+4. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
+5. Push the keystone couplers in from the front until they click.
+6. Rack it, then tighten the M4s once the depth looks right.
+7. Slide each PC in from the front. Slide its rear stop forward until it touches the
+   bottom of the rear face, tighten, then fit the front lip.
+8. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
+   centre. Strap them down. DC leads run forward to each machine's power jack; coil the
    slack in the free two-thirds of the bay.
+9. Video leads go inboard behind the tray, into the centre gap, then forward along the
+   cable floor to the back of the keystones. Zip-tie them to the slot pairs in the cable
+   floor and the anchors along the inboard edge of each brick bay.
 
 ## Servicing
 
@@ -94,7 +102,9 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 
 | Parameter | Default | Effect |
 |---|---|---|
-| `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope; `dev_h` also sets the rear stop hook height |
+| `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope |
+| `stop_h` | 8 | how far up the rear face the rear stop reaches |
+| `cf_y0` | 44 | where the cable floor starts; the lower video plug has to clear it |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
