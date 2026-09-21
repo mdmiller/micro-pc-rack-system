@@ -48,8 +48,16 @@ openscad -o stl/tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 
 Change dimensions in the source, not in the STLs. `build.sh` writes STLs in a canonical
 triangle order, so rebuilding unchanged geometry leaves git clean — an STL diff means
-the shape really changed. A different OpenSCAD version can still tessellate curves
-differently, so if STLs change after upgrading OpenSCAD, that's why. v1 to v3.1 were iterated in Claude Cowork before this repo had any git
+the shape really changed.
+
+**OpenSCAD version: 2026.09.18** (a development snapshot). Different versions
+tessellate curves differently, so everyone builds with the same one. `build.sh` warns if
+yours differs. On macOS, `brew install --cask openscad@snapshot`; elsewhere, see
+<https://openscad.org/downloads.html#snapshots>. Snapshots move daily, so don't
+`brew upgrade` it on your own: moving the pin means changing `OPENSCAD_VERSION` in
+`build.sh` and committing the rebuilt STLs together.
+
+v1 to v3.1 were iterated in Claude Cowork before this repo had any git
 history, so the first commit is v3.1 (tagged `v3.1`) and the earlier versions survive
 only in [docs/DECISIONS.md](docs/DECISIONS.md). Development continues here with Claude
 Code; later delivered designs get their own tags. **Run

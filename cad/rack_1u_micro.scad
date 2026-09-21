@@ -26,6 +26,8 @@ brk_row_dz  = 23.8;    // vertical spacing of the two hole rows
 brk_col_dy  = 110;     // depth spacing of the two hole columns
 brk_len     = 139.4;   // bracket web length
 brk_t       = 1.5;     // bracket steel thickness
+rack_open   = 450.85;  // measured clear width between the front rails (#5)
+rack_margin = 2.0;     // minimum clearance per side, across the ear-bolt heads (D28)
 
 /* [Device] */
 dev_w = 182;
@@ -36,7 +38,7 @@ fit   = 1;
 /* [Structure] */
 wall_o   = 11;    // outer wall — carries the M4 ear-bolt pockets
 wall_i   = 8;     // inner wall — carries the keystone, tie-plate and lip screws
-key_w    = 36;
+key_w    = 33;    // narrowest the braced, rotated jacks allow (D28)
 floor_t  = 3;
 tray_d   = 206;
 pad_t    = 3;
@@ -56,13 +58,21 @@ ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
 ks_clr = 0.3;     // side clearance of the keystone panel in the gap between trays
+ks_relief_d = 1.0;  // relief in the flange underside over the upper rear video plug,
+ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
+
+/* [Braces] — D27 */
+ks_brace   = 12;   // keystone panel-to-flange braces, leg length
+ks_brace_w = 3.7;  // each sits in the strip outside the jacks, clear of latch travel
+bb_brace   = 11;   // brick bay inner tab brace; tops out below the M3 head at z 20
+bb_brace_o = 4.5;  // brick bay outer tab brace, above the outer lip
 
 /* [Rear stop] */
 stop_h = 8;       // top of the stop face above the tray floor; the stop touches
                   // only this band of the rear face, so any port layout clears it
 
 /* [Cable floor] */
-cf_y0   = 44;     // starts behind the keystone jack bodies
+cf_y0   = 50;     // starts behind the lower rear video plug's head (slim HDMI, D26)
 cf_ext  = 16;     // overhang past the tray rear, into the gap between brick bays
 cf_t    = 3;
 ledge_w = 6;      // ledge on each inner wall that carries the cable floor
@@ -114,7 +124,7 @@ lip_scr_z = floor_t + lip_tab_h/2;
 bb_d    = bb_front + bb_depth + bb_rear;
 cf_w    = key_w - 0.6;
 cf_len  = tray_d + cf_ext - cf_y0;
-cf_scr_y = [54, 112, 170];          // clear of the keystone flange and tie plate
+cf_scr_y = [58, 112, 170];          // clear of the keystone flange and tie plate
 
 module rr(w,h,r=2) { offset(r=r) square([w-2*r,h-2*r],center=true); }
 module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(len) children(); }
@@ -199,7 +209,12 @@ module keystone() {
       translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, panel_t, panel_h]);
       translate([seam_l-wall_i, panel_t, wall_hi])
         cube([key_w+2*wall_i, flange_l, flange_t]);
+      for (x0=[seam_l+ks_clr, seam_r-ks_clr-ks_brace_w])             // braces: the panel
+        translate([x0,0,0]) rotate([90,0,90]) linear_extrude(ks_brace_w) // hangs from this joint
+          polygon([[panel_t,wall_hi],[panel_t,wall_hi-ks_brace],[panel_t+ks_brace,wall_hi]]);
     }
+    translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi-eps])    // plug relief, clear of
+      cube([ks_relief_w, flange_l-ks_wall+eps, ks_relief_d+eps]);      // the panel joint at y=6
     for (z = ks_z) {
       yprism(body_w/2, z, panel_t+2*eps) square([ks_w, ks_h], center=true);
       translate([body_w/2, ks_wall, z]) rotate([-90,0,0])
@@ -281,6 +296,10 @@ module brick_bay() {
       for (x=[0, seam_l-wall_i])                             // front mounting tabs
         translate([x, 0, 0]) cube([x==0?wall_o:wall_i, 4, 32]); // from the floor: the
                                                                // inner edge has no lip
+      translate([seam_l-wall_i,0,0]) rotate([90,0,90]) linear_extrude(wall_i)   // tab braces
+        polygon([[4,floor_t+1],[4,floor_t+1+bb_brace],[4+bb_brace,floor_t+1]]);
+      rotate([90,0,90]) linear_extrude(wall_o)
+        polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
     for (x=[30,70,110,150], y=[18, 93])                      // velcro strap slots

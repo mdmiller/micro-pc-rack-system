@@ -20,6 +20,10 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
 | 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23); fastener lengths, keystone clearance and assembly order corrected (D24). |
+| 2026-09-21 | OpenSCAD pinned to 2026.09.18 (D25). |
+| 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
+| 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
+| 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
 
 ---
 
@@ -49,7 +53,7 @@ per tray is safe, at the cost of a 2 mm asymmetry in the front frame.
 Two jacks, one per machine, for DP/HDMI couplers. Networking stays at the rear.
 In v3 the jacks are rotated 90° and stacked: the thicker outer walls (D9) cost 12 mm
 of width that had to come from the centre column, and side-by-side jacks would have
-left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3 and 36 in v3.1 (D19).
+left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3, 36 in v3.1 (D19) and 33 after D28. Rear-plug clearance for this layout: D26.
 
 ---
 
@@ -96,7 +100,7 @@ missing. Heat-set inserts can't be slotted, and there's no room inside the bay f
 loose nuts. Each outer wall instead carries two M4 nut channels running front to back.
 Consequences: outer wall 11 mm; M4 × 8 **button head** (a longer bolt bottoms out,
 a socket head fouls the rail); body 442 mm, leaving 2.5 mm per side in a 450 mm
-opening. Verified: an M4 hex nut seats in the channel and the bolt clears.
+opening. **Correction (D28):** that counted the steel but not the bolt heads. Verified: an M4 hex nut seats in the channel and the bolt clears.
 **Superseded by D22:** the nuts could never be loaded into the channels.
 
 ### D10 — Centre tie at front and rear
@@ -327,4 +331,111 @@ New tests:
 - `keystone_side_clear`: fails on v3.1 with 131 mm³ of overlap, passes now.
 - `cf_holes`: now uses 2.6 mm cores, so a tip that runs through a pilot's skin shows up
   above the 2 mm³ threshold.
+
+### D25 — Pin the OpenSCAD version (2026-09-21)
+Different OpenSCAD versions tessellate curves differently. `canon_stl.py` only makes
+identical *triangles* byte-identical, so two contributors on different versions each
+rewrite every curved STL on every build. The review PRs (D21–D24) were built on
+2026.06.12, and three STLs then changed when rebuilt on 2026.09.18, with no change in
+shape. Pinned to 2026.09.18, the version the owner already had and the current
+Homebrew `openscad@snapshot`. `build.sh` warns on a mismatch rather than failing,
+because a mismatched build is still geometrically correct, just noisy in git. The
+2021.01 stable release was never in use here.
+
+### D26 — Rear video plug clearance (2026-09-21, issue #6)
+The rotated, stacked jacks (D4) put each rear plug on its long edge, 18.8 mm apart,
+between the keystone flange above (underside at z = 39, back to y = 36) and the
+cable floor below. Plugs were modelled as blocks at two coupler depths (rear face 24
+and 32 mm behind the panel front):
+
+- **Standard HDMI or DP heads (~21 × 11 × 40 mm)** collide with each other, the
+  flange and the cable floor under every small change considered. The two plugs alone
+  overlap by ~1000 mm³.
+- **Slim HDMI heads (16 × 6.6 × 14 mm)** missed by ~0.2 mm per side at the flange and
+  hit the cable floor at the deeper coupler depth.
+- **Mini-DP** is smaller still.
+
+Three ways to make 2 × slim HDMI fit were compared:
+
+| Option | Upper plug to flange | Plug to plug | Cost |
+|---|---|---|---|
+| `ks_gap` 4 → 3 | 0.3 mm | 1.8 mm | halves the full-thickness plastic between the jacks (2 → 1 mm) |
+| **1 mm relief in the flange underside** | 0.8 mm | 2.8 mm | flange 2 mm thick instead of 3 over a 9 mm-wide strip |
+| Move the flange back | — | — | restructures the keystone module for no extra gain |
+
+Chosen: the relief (`ks_relief_d` = 1.0, `ks_relief_w` = 9). It starts behind the
+panel at y = 8.8, so the panel-to-flange joint is untouched. `cf_y0` goes from 44 to 50
+so the lower plug's head clears the floor. The first cable-floor screw pair moves
+54 → 58 to keep its edge distance.
+
+**Supported cables:**
+- 2 × slim HDMI (passive; active RedMere cables may not like a passive coupler);
+- 2 × mini-DP;
+- one of each;
+- mini-DP upper with standard HDMI lower, provided `cf_y0` goes to ~85–90.
+
+Standard-head cables in both jacks would need the jacks turned upright and the flange
+cut away over them. That's a different layout, not taken.
+
+Tests: `plug_vs_keystone`, `plug_vs_cf` and `plug_vs_plug` check both jacks at both
+coupler depths. The first two failed before this change. `flange_over_relief` checks
+that 2 mm of flange remains.
+
+### D27 — Brace the keystone panel and the brick bay tabs (2026-09-21, issue #11)
+Two parts behave like vertical posts loaded across their print layers. The numbers
+are hand calculations with rounded loads; the ratios are what matter.
+
+**Keystone panel.** It hangs from a 35.4 × 3 mm joint with the flange. The module
+prints panel-down, so that joint is a layer boundary. A 30 N push on the lower jack,
+from plugging a monitor into the front, gives ~16 MPa there, repeated at every plug-in.
+Two 12 mm braces between the panel back and the flange underside fix it. They sit in
+the 3.7 mm strips at the panel edges, clear of the jacks' latch travel. The composite
+section takes the same push to ~2.2 MPa, about 7× less, and the braces print as 45°
+fins.
+
+**Brick bay tabs.** The bay hangs from two bolts at z = 20.
+- **Inner tab (8 × 4 mm).** At rest it sees ~6.5 MPa at its root; a 50 N handling load
+  gives ~38 MPa. An 11 mm brace behind it, topping out below the bolt head, moves the
+  weakest section up to the brace top, where the same load gives ~12 MPa.
+- **Outer tab (above the 12 mm lip).** A 50 N load gives ~14 MPa; a 4.5 mm brace takes
+  it to ~6 MPa.
+
+The bay braces sit in the front ~25 mm that is already kept clear for the machines'
+rear plugs.
+
+**Not braced:**
+- the tray wall-to-floor corners inside the bays (~1 mm PC clearance, no room);
+- the tray's front posts (backed by the full-length walls).
+
+Tests: `ks_braces_present` and `bb_braces_present_L` fail before this change and pass
+now. `ks_latch_room` keeps the jacks plus 2.5 mm of latch travel clear; widening the
+braces to 6 mm makes it fail. `bb_driver_clear_L` keeps the M3 heads and the screwdriver
+path along y clear.
+
+### D28 — Clearance in the rack opening (2026-09-21, issue #5)
+With the steel ears fitted, the shelf is widest across the M4 button heads: body
++ 2 × 1.5 mm web + 2 × 2.2 mm head. At 442 mm that was 449.4 mm. The rack's clear width
+between the front rails was measured at 450.85 mm (17¾", two tapes), leaving 0.7 mm
+per side. That's about a tape measure's own accuracy, before print tolerance or web
+flatness. Standard rack equipment leaves about 3 mm per side.
+
+Four ways to take 3 mm out were run against the full test suite:
+
+| Change | Result |
+|---|---|
+| **Keystone column 36 → 33** | all checks pass |
+| Column 34, bay fit 1 → 0.75 | machines graze the openings sliding out (`pullout`) |
+| Inner walls 8 → 7, bay fit 0.75 | `pullout` and `lip_clear_of_face` fail |
+| Column 34, inner walls 7.5 | `lip_clear_of_face` fails |
+
+Chosen: `key_w` = 33, giving a 439 mm body, 446.4 mm across the bolt heads and
+**2.2 mm per side**. The keystone panel, tie plate and cable floor are all derived from
+`key_w` and follow. The cost is latch access: the gap between each keystone brace (D27)
+and the jack body shrinks from ~4.3 to ~2.85 mm. That still covers the 2.5 mm of latch
+travel `ks_latch_room` reserves, and couplers are fitted once on the bench. 33 is the
+floor: at 32 the braces cut into the latch clearance.
+
+`rack_open` and `rack_margin` now live in the source. The new test
+`rack_width_margin` models the heads at every bolt and fails if they come within
+2 mm of the rails; it fails at 36 (461 mm³ outside the margin) and passes at 33.
 

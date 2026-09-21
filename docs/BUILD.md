@@ -5,7 +5,9 @@ video pass-through and a bolt-on rear bay for the power bricks. Mounts on **stee
 ears** — there is no printed ear, so no plastic in the critical load path.
 
 Bays accept up to **182 × 183 × 36 mm**: Lenovo ThinkCentre/ThinkStation Tiny, Dell
-OptiPlex Micro, HP EliteDesk Mini. Overall depth ~316 mm.
+OptiPlex Micro, HP EliteDesk Mini. Overall depth ~316 mm. Overall width 439 mm, or
+446.4 mm across the ear-bolt heads with the steel ears fitted: allow at least 450.4 mm
+clear between the front rails (2 mm per side; D28).
 
 Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenerate with `bash build.sh`.
 
@@ -17,11 +19,11 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 |---|---|---|
 | `tray_left` / `tray_right` | 1 each | 209 × 206 × 44 mm |
 | `brick_bay` | 2 | 203 × 110 × 32 mm |
-| `keystone` | 1 | 52 × 44 × 36 mm |
+| `keystone` | 1 | 49 × 44 × 36 mm |
 | `rear_stop` | 2 | 64 × 26 × 5 mm |
 | `front_lip` | 2 | 202 × 11 × 3 mm — symmetric, same part both sides |
-| `tie_plate` | 1 | 52 × 30 × 3 mm |
-| `cable_floor` | 1 | 35 × 178 × 3 mm |
+| `tie_plate` | 1 | 49 × 30 × 3 mm |
+| `cable_floor` | 1 | 32 × 172 × 3 mm |
 
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
@@ -54,8 +56,17 @@ about creep in a warm rack over months, not about strength.
 - All M3 threads directly into 2.7 mm printed pilots. No inserts anywhere.
 
 **Other**
-- 2 × keystone couplers, HDMI or DP female-female (mix freely, the apertures are identical)
-- 2 × short video cables, PC rear port to the back of the jack
+- 2 × keystone couplers, female-female: HDMI or mini-DisplayPort, one per machine
+- 2 × video cables, PC rear port to the back of the jack. **The plug heads must be
+  small.** The jacks are rotated, so each rear plug stands on its long edge, and the two
+  sit on 18.8 mm centres. Use one of:
+  - slim-head HDMI, passive, head ≤ 16 mm wide (e.g. Monoprice Ultra Slim, Cable Matters
+    Ultra Thin);
+  - mini-DP couplers with DP ↔ mini-DP cables (the machines keep their full-size DP ports).
+
+  Standard-head HDMI or DP plugs (~21 mm) collide with each other and with the keystone
+  flange. A standard HDMI plug fits only in the **lower** jack, with a mini-DP above it,
+  and then the cable floor has to start at ~85–90 mm (`cf_y0`). See D26.
 - 4 × velcro straps for the power bricks
 - Small zip ties (up to 4 mm wide) for the DC and video leads
 
@@ -122,12 +133,17 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 |---|---|---|
 | `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope |
 | `stop_h` | 8 | how far up the rear face the rear stop reaches |
-| `cf_y0` | 44 | where the cable floor starts; the lower video plug has to clear it |
+| `cf_y0` | 50 | where the cable floor starts; the lower rear video plug's head has to clear it |
+| `ks_relief_d`, `ks_relief_w` | 1.0, 9 | relief in the keystone flange underside over the upper rear plug |
+| `ks_brace`, `ks_brace_w` | 12, 3.7 | keystone panel-to-flange braces; wider than 3.7 intrudes on latch travel |
+| `bb_brace`, `bb_brace_o` | 11, 4.5 | brick bay inner and outer tab braces; the inner one must stay below the M3 head at z 20 |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
+| `key_w` | 33 | keystone column width; 33 is the narrowest the braced jacks allow (D28) |
+| `rack_open`, `rack_margin` | 450.85, 2.0 | measured rail opening and the clearance `tests/run.sh` enforces across the ear-bolt heads |
 
 ## Known limitations
 

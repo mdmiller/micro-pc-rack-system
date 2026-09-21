@@ -87,3 +87,34 @@ if (test=="stop_screws_R")    intersection(){ tray_right(); stopRods(body_w-bay_
 // the keystone panel must keep >= 0.25 mm each side between the tray panels
 if (test=="keystone_side_clear") intersection(){ keystone();
   union(){ translate([0.25,0,0]) tray_left(); translate([-0.25,0,0]) tray_right(); } }
+// Rear video plugs (D26). The jacks are rotated, so each plug stands on its long edge.
+// Slim HDMI head 16 x 6.6 x 14 mm; coupler rear face 24 or 32 mm behind the panel
+// front (couplers vary), so both depths are checked.
+module plug(zc,yf) translate([body_w/2-3.3, yf, zc-8]) cube([6.6, 14, 16]);
+module plugs(yf) { plug(ks_z[0],yf); plug(ks_z[1],yf); }
+if (test=="plug_vs_keystone") intersection(){ keystone(); union(){ plugs(24); plugs(32); } }
+if (test=="plug_vs_cf")       intersection(){ cfP(); union(){ plugs(24); plugs(32); } }
+if (test=="plug_vs_plug")     union(){ intersection(){ plug(ks_z[0],24); plug(ks_z[1],24); }
+                                       intersection(){ plug(ks_z[0],32); plug(ks_z[1],32); } }
+// the relief must not break through: 2 mm of flange stays over it
+if (test=="flange_over_relief") intersection(){ keystone();
+  translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi+ks_relief_d]) cube([ks_relief_w, flange_l-ks_wall, flange_t-ks_relief_d]); }
+// Braces (D27): present, and clear of latch travel and the bay screwdrivers
+if (test=="ks_braces_present")  intersection(){ keystone(); for (x0=[seam_l+ks_clr, seam_r-ks_clr-ks_brace_w])
+  translate([x0, panel_t, wall_hi-8]) cube([ks_brace_w, 3, 8]); }
+if (test=="bb_braces_present_L") intersection(){ bbL(); union(){
+  translate([seam_l-wall_i, tray_d+4, floor_t+2]) cube([wall_i, 4, 5]);
+  translate([0, tray_d+4, bb_lip]) cube([wall_o, 2, 2]); } }
+module latchZone() for (zc=ks_z) translate([body_w/2-ks_w/2-2.5, panel_t, zc-ks_h/2]) cube([ks_w+5, 30, ks_h]);
+if (test=="ks_latch_room")      intersection(){ keystone(); latchZone(); }
+module bayDrivers() for (x=[wall_o/2, seam_l-wall_i/2])   // M3 pan head + screwdriver along y
+  translate([x, tray_d+4, 20]) rotate([-90,0,0]) cylinder(d=6, h=bb_d);
+if (test=="bb_driver_clear_L")  intersection(){ bbL(); bayDrivers(); }
+// Rack width (D28): with the steel webs and M4 button heads (ISO 7380: 7.6 mm x 2.2 mm)
+// fitted, the shelf must clear the measured rail opening by rack_margin each side.
+module earHeads(){ for (s=[0,1], z=brk_z, c=[0,1])
+  translate([s==0 ? -brk_t : body_w+brk_t, ear_c0+c*brk_col_dy, z]) rotate([0,s==0?-90:90,0]) cylinder(d=7.6, h=2.2); }
+module outsideEnvelope(){ half=rack_open/2-rack_margin;
+  translate([body_w/2-half-50,-10,-10]) cube([50,260,70]); translate([body_w/2+half,-10,-10]) cube([50,260,70]); }
+if (test=="rack_width_margin") intersection(){ union(){ tray_left(); tray_right(); earHeads(); } outsideEnvelope(); }
+
