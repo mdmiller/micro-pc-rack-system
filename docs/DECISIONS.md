@@ -14,7 +14,7 @@ the way are noted where they happened and collected under Corrections at the end
 |---|---|
 | 2026-09-19 | Brief: 1U shelf, two micro PCs, front keystone for video. v1 drafted internally and rejected; v2 delivered. |
 | 2026-09-19 | Mixed Lenovo + Dell confirmed. Survey of public designs. |
-| 2026-09-20 | Structural analysis, print orientation, steel ears, front serviceability. Power bricks raised as a hard requirement. Rack is 2-post / wall-mount. MS-01 modularity raised. |
+| 2026-09-20 | Structural analysis, print orientation, steel ears, front serviceability. Power bricks raised as a hard requirement. Front-rail-only mounting set as a constraint. MS-01 modularity raised. |
 | 2026-09-20 | Steel bracket drawing received; v3 designed, verified and shared. |
 | 2026-09-20 | Second prior-art pass; the closest public design examined in detail. |
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
@@ -107,8 +107,8 @@ it needs support in the centre once racked (see prior-art.md).
 ## Serviceability and retention
 
 ### D11 — Front loading
-The rack is tight to work in, and pulling the whole shelf to service one machine was
-not acceptable. Since the corridor was already clear (D2), v3 only needed a front stop.
+In a tightly packed rack, pulling the whole shelf to service one machine is not
+acceptable. Since the corridor was already clear (D2), v3 only needed a front stop.
 
 ### D12 — Front lip instead of clips
 Per-bay clips were planned, but there's no structural material inside the full-width
@@ -125,9 +125,11 @@ case's rear top edge to stop lift. It's positioned at build time, not a service 
 ## Power bricks
 
 ### D14 — Bricks on the same shelf, behind the PCs
-The rack is 2-post / wall-mount, so the shelf grows
-rearward in a bolt-on bay rather than using rear rails. D6 showed the extra moment is
-harmless.
+Not a separate U: the point of the design is density, and a U spent on power bricks
+is a U lost. The shelf mounts on the front rails only (requirement 8), so it grows
+rearward in a bolt-on bay rather than reaching for rear rails. D6 showed the extra
+moment is harmless. On a 4-post rack, rear support is an available fallback, but
+nothing in the design needs it.
 
 ### D15 — Bricks crosswise
 Designed to the Lenovo brick (112 × 51 × 35 mm plus ~70 mm of plug and boot) and the
@@ -143,6 +145,13 @@ floor, open rear, and bays that unbolt so the bricks can move to their own U wit
 touching anything else. Later evidence: the closest public design puts two PCs and
 both bricks in 1U with the bricks directly behind, printed in PLA+, and months of
 use by several builders produced no heat or warping complaints. Still worth watching.
+
+Design assumptions: machines that run mostly idle rather than at sustained full
+load, in a rack with its own forced ventilation and an interior at or below about
+40 °C (100 °F). Under those assumptions, going to 2U for thermal reasons was rejected
+as a waste of rack space, and the shelf has no fan of its own. If your rack is
+hotter, unventilated, or the machines run flat out, revisit this: the open rear
+leaves room to add a fan, and the brick bays unbolt.
 
 ---
 

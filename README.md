@@ -22,7 +22,8 @@ explains how each one shaped it.
 5. A rear stop to locate each machine.
 6. Power bricks and cord management on the shelf itself.
 7. Metal, not plastic, in the rack-mounting load path.
-8. Works on a 2-post / wall-mount rack — no rear rails to brace against.
+8. Front-rail mounting only — no dependence on rear rails. That covers 2-post and
+   wall-mount racks, and 4-post racks where the rear is taken up by cabling.
 9. Modular toward a future 2U shelf for Minisforum MS-01s, sharing parts.
 
 ## Layout
