@@ -5,7 +5,10 @@
 //  (Penn-Elcom R1206/1U or equivalent) — no printed ear.
 //
 //  x = 0 at the left rail face, y = 0 at the rack face, z = 0 at the
-//  bottom of the U.  Units: millimetres.  Licence: CC-BY-4.0
+//  bottom of the U.  Units: millimetres.
+//
+//  © 2026 Matt Miller and contributors.  Licence: CC BY-NC-SA 4.0
+//  SPDX-License-Identifier: CC-BY-NC-SA-4.0
 // =====================================================================
 
 /* [Part to render] */

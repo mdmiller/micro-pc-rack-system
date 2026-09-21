@@ -68,5 +68,13 @@ where relevant.
       DECISIONS.md.
 - [ ] Choose a keystone coupler type (DP or HDMI) per machine.
 - [ ] Get the MS-01 power adapter dimensions, then design the 2U shelf.
-- [ ] Choose a licence. The source headers currently say CC-BY-4.0; that was added
-      during drafting without anyone deciding it.
+
+## Licence
+
+© 2026 Matt Miller and contributors. Everything in this repo — CAD source, STLs,
+scripts and docs — is licensed under
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/); full text in
+[LICENSE](LICENSE). In short: print it, use it and remix it freely, as long as you
+credit this project, don't use it commercially (that includes selling prints), and
+share your remixes under the same licence. For anything commercial, open an issue
+and ask.

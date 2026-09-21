@@ -161,6 +161,15 @@ into Fusion 360 for a remix and gave up to redraw from scratch; and changing the
 for a Lenovo plus adding keystones would alter exactly the geometry that had been
 field-tested. What transferred instead was information (D10, D16).
 
+### D20 — Licence: CC BY-NC-SA 4.0 (2026-09-21)
+The goal: anyone can print, use and remix the design, with attribution, but not
+commercially. CC BY-NC-SA 4.0 does that, and ShareAlike keeps remixes under the same
+terms. One licence covers the whole repo, scripts included — Creative Commons advises
+against CC licences for software, but the scripts here are small helpers tied to the
+design, and splitting licences wasn't worth the complexity. CC BY-NC (no ShareAlike)
+was the alternative considered. The `CC-BY-4.0` note in the v3 source header was
+added during drafting without anyone deciding it, and is replaced.
+
 ---
 
 ## Corrections
