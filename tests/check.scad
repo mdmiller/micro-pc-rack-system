@@ -62,3 +62,18 @@ if (test=="m4_past_travel")   intersection(){ tray_left(); m4all(false, 4); } //
 // the brick bay's inner mounting tab must reach the floor (it once floated 4 mm above it)
 module innerTabRoot(){ translate([seam_l-wall_i, tray_d, floor_t+1]) cube([wall_i, 4, 8-(floor_t+1)]); }
 if (test=="bb_tab_rooted_L")  intersection(){ bbL(); innerTabRoot(); }
+// cable floor, rear stop band, zip-tie clearance
+module cfP(){ translate([seam_l+0.3,cf_y0,ledge_h]) cable_floor(); }
+module cfRods(){ for(x=[seam_l+ledge_w/2, seam_r-ledge_w/2], y=cf_scr_y)      // M3 x 6 cores
+  translate([x,y,ledge_h+cf_t-6]) cylinder(d=2.0,h=6); }
+module zipVoid(){ translate([seam_l+ledge_w+0.5,cf_y0,0]) cube([key_w-2*ledge_w-1,tray_d-cf_y0,ledge_h]); }
+module rearFaceAbove(){ translate([bay_x0+fit,panel_t+dev_d,floor_t+stop_h]) cube([dev_w,1,dev_h-stop_h]); }
+module rearFaceBand(){  translate([bay_x0+fit,panel_t+dev_d,floor_t]) cube([dev_w,1,stop_h]); }
+if (test=="tray_cf")          intersection(){ union(){ tray_left(); tray_right(); } cfP(); }
+if (test=="keystone_cf")      intersection(){ keystone(); cfP(); }
+if (test=="tie_cf")           intersection(){ tieP(); cfP(); }
+if (test=="bricks_cf")        intersection(){ union(){ bbL(); bbR(); } cfP(); }
+if (test=="cf_holes")         intersection(){ union(){ tray_left(); tray_right(); cfP(); } cfRods(); }
+if (test=="ziptie_void")      intersection(){ union(){ tray_left(); tray_right(); keystone(); cfP(); } zipVoid(); }
+if (test=="rear_face_open_L") intersection(){ stopL(); rearFaceAbove(); }
+if (test=="stop_meets_face_L")intersection(){ stopL(); rearFaceBand(); }

@@ -19,7 +19,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-20 | Second prior-art pass; the closest public design examined in detail. |
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
-| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22). |
+| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23). |
 
 ---
 
@@ -40,7 +40,7 @@ so v2 had no front stop at all. That turned out to make front loading (D11) almo
 
 ### D3 — Mixed machines share one envelope
 Bays are sized for the larger of the two in every axis (182 × 183 × 36). Only the
-rear stop varies by model (a 34.5 mm Lenovo variant exists). Do **not** re-render a
+rear stop varies by model (a 34.5 mm Lenovo variant existed until D23 made one stop fit all). Do **not** re-render a
 tray with a different `dev_h` or `dev_d`: `dev_h` sets the inner wall height the
 keystone flange and tie plate sit on, and `dev_d` moves the tie-plate screws. `dev_w`
 per tray is safe, at the cost of a 2 mm asymmetry in the front frame.
@@ -121,6 +121,7 @@ Two screws, lip off, machine slides out. Redesigned in v3.1 after defects were f
 ### D13 — Rear stop is set once
 Slotted for ±7 mm (172–186 mm device depth), with a 45° self-supporting hook over the
 case's rear top edge to stop lift. It's positioned at build time, not a service item.
+**Hook replaced by a low curb in D23.**
 
 ---
 
@@ -263,4 +264,37 @@ confirmed it fit. It never asked how the nut got there. Replaced by:
 - `m4_hw_insertable`: washer and nut swept in from the bay.
 - `m4_past_travel`: the same hardware 4 mm past the end of travel must hit wall, which
   proves the other two can fail.
+
+### D23 — Open rear, cable floor, zip-tie anchors (2026-09-21)
+**Rear stop.** The hook's web was a solid plate 64 mm wide and 33 mm tall, flush
+against the middle third of each machine's rear face (about 32% of it), where the
+ports and exhaust are. That conflicts with requirement 3's rear video cables and with
+D16's airflow, and it depended on `dev_h`, hence the Lenovo variant. The stop is now
+a curb that touches only the bottom `stop_h` (8 mm) of the rear face. One part fits
+every machine, the rear stays open for any port layout, and the Lenovo variant is
+gone. It gives up the hook's lift restraint; the U above and the front lip bound that.
+
+**Cable floor.** Requirement 6 calls cord management imperative, but the video leads
+had no supported route to the keystones:
+- the inner wall behind each machine is solid;
+- the tie plate leaves ~2.5 mm over the top of the wall;
+- the centre channel between the trays had nothing under it.
+
+A new `cable_floor` part spans the channel on a 6 × 4 mm ledge added to each inner
+wall and screws down from above. Zip ties pass through slot pairs into the 4 mm gap
+beneath, so nothing hangs below the shelf. It also ties the bottoms of the two trays
+together; that stiffening hasn't been quantified. The route for each video lead is:
+machine's rear → brick bay → centre gap → cable floor → keystone. D15's "DC leads run
+forward through the centre gap" was a slip: DC leads only go forward to each
+machine's own jack.
+
+**Brick bay.** Zip-tie anchors along the inboard edge: slot pairs joined by an
+underside groove, so the strap sits flush with the bottom face.
+
+New tests:
+- `tray_cf`, `keystone_cf`, `tie_cf`, `bricks_cf`: no collisions.
+- `cf_holes`: screw cores pass the floor into the ledge pilots without bottoming out.
+- `ziptie_void`: the gap under the floor is clear.
+- `rear_face_open_L`: nothing touches the rear face above the curb.
+- `stop_meets_face_L`: the curb does meet the face.
 
