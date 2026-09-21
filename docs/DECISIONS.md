@@ -23,6 +23,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | OpenSCAD pinned to 2026.09.18 (D25). |
 | 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
 | 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
+| 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
 
 ---
 
@@ -52,7 +53,7 @@ per tray is safe, at the cost of a 2 mm asymmetry in the front frame.
 Two jacks, one per machine, for DP/HDMI couplers. Networking stays at the rear.
 In v3 the jacks are rotated 90° and stacked: the thicker outer walls (D9) cost 12 mm
 of width that had to come from the centre column, and side-by-side jacks would have
-left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3 and 36 in v3.1 (D19). Rear-plug clearance for this layout: D26.
+left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3, 36 in v3.1 (D19) and 33 after D28. Rear-plug clearance for this layout: D26.
 
 ---
 
@@ -99,7 +100,7 @@ missing. Heat-set inserts can't be slotted, and there's no room inside the bay f
 loose nuts. Each outer wall instead carries two M4 nut channels running front to back.
 Consequences: outer wall 11 mm; M4 × 8 **button head** (a longer bolt bottoms out,
 a socket head fouls the rail); body 442 mm, leaving 2.5 mm per side in a 450 mm
-opening. Verified: an M4 hex nut seats in the channel and the bolt clears.
+opening. **Correction (D28):** that counted the steel but not the bolt heads. Verified: an M4 hex nut seats in the channel and the bolt clears.
 **Superseded by D22:** the nuts could never be loaded into the channels.
 
 ### D10 — Centre tie at front and rear
@@ -410,4 +411,31 @@ Tests: `ks_braces_present` and `bb_braces_present_L` fail before this change and
 now. `ks_latch_room` keeps the jacks plus 2.5 mm of latch travel clear; widening the
 braces to 6 mm makes it fail. `bb_driver_clear_L` keeps the M3 heads and the screwdriver
 path along y clear.
+
+### D28 — Clearance in the rack opening (2026-09-21, issue #5)
+With the steel ears fitted, the shelf is widest across the M4 button heads: body
++ 2 × 1.5 mm web + 2 × 2.2 mm head. At 442 mm that was 449.4 mm. The rack's clear width
+between the front rails was measured at 450.85 mm (17¾", two tapes), leaving 0.7 mm
+per side. That's about a tape measure's own accuracy, before print tolerance or web
+flatness. Standard rack equipment leaves about 3 mm per side.
+
+Four ways to take 3 mm out were run against the full test suite:
+
+| Change | Result |
+|---|---|
+| **Keystone column 36 → 33** | all checks pass |
+| Column 34, bay fit 1 → 0.75 | machines graze the openings sliding out (`pullout`) |
+| Inner walls 8 → 7, bay fit 0.75 | `pullout` and `lip_clear_of_face` fail |
+| Column 34, inner walls 7.5 | `lip_clear_of_face` fails |
+
+Chosen: `key_w` = 33, giving a 439 mm body, 446.4 mm across the bolt heads and
+**2.2 mm per side**. The keystone panel, tie plate and cable floor are all derived from
+`key_w` and follow. The cost is latch access: the gap between each keystone brace (D27)
+and the jack body shrinks from ~4.3 to ~2.85 mm. That still covers the 2.5 mm of latch
+travel `ks_latch_room` reserves, and couplers are fitted once on the bench. 33 is the
+floor: at 32 the braces cut into the latch clearance.
+
+`rack_open` and `rack_margin` now live in the source. The new test
+`rack_width_margin` models the heads at every bolt and fails if they come within
+2 mm of the rails; it fails at 36 (461 mm³ outside the margin) and passes at 33.
 

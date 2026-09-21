@@ -5,7 +5,9 @@ video pass-through and a bolt-on rear bay for the power bricks. Mounts on **stee
 ears** — there is no printed ear, so no plastic in the critical load path.
 
 Bays accept up to **182 × 183 × 36 mm**: Lenovo ThinkCentre/ThinkStation Tiny, Dell
-OptiPlex Micro, HP EliteDesk Mini. Overall depth ~316 mm.
+OptiPlex Micro, HP EliteDesk Mini. Overall depth ~316 mm. Overall width 439 mm, or
+446.4 mm across the ear-bolt heads with the steel ears fitted: allow at least 450.4 mm
+clear between the front rails (2 mm per side; D28).
 
 Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenerate with `bash build.sh`.
 
@@ -17,11 +19,11 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 |---|---|---|
 | `tray_left` / `tray_right` | 1 each | 209 × 206 × 44 mm |
 | `brick_bay` | 2 | 203 × 110 × 32 mm |
-| `keystone` | 1 | 52 × 44 × 36 mm |
+| `keystone` | 1 | 49 × 44 × 36 mm |
 | `rear_stop` | 2 | 64 × 26 × 5 mm |
 | `front_lip` | 2 | 202 × 11 × 3 mm — symmetric, same part both sides |
-| `tie_plate` | 1 | 52 × 30 × 3 mm |
-| `cable_floor` | 1 | 35 × 172 × 3 mm |
+| `tie_plate` | 1 | 49 × 30 × 3 mm |
+| `cable_floor` | 1 | 32 × 172 × 3 mm |
 
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
@@ -140,6 +142,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
+| `key_w` | 33 | keystone column width; 33 is the narrowest the braced jacks allow (D28) |
+| `rack_open`, `rack_margin` | 450.85, 2.0 | measured rail opening and the clearance `tests/run.sh` enforces across the ear-bolt heads |
 
 ## Known limitations
 

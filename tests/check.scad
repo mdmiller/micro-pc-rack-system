@@ -110,4 +110,11 @@ if (test=="ks_latch_room")      intersection(){ keystone(); latchZone(); }
 module bayDrivers() for (x=[wall_o/2, seam_l-wall_i/2])   // M3 pan head + screwdriver along y
   translate([x, tray_d+4, 20]) rotate([-90,0,0]) cylinder(d=6, h=bb_d);
 if (test=="bb_driver_clear_L")  intersection(){ bbL(); bayDrivers(); }
+// Rack width (D28): with the steel webs and M4 button heads (ISO 7380: 7.6 mm x 2.2 mm)
+// fitted, the shelf must clear the measured rail opening by rack_margin each side.
+module earHeads(){ for (s=[0,1], z=brk_z, c=[0,1])
+  translate([s==0 ? -brk_t : body_w+brk_t, ear_c0+c*brk_col_dy, z]) rotate([0,s==0?-90:90,0]) cylinder(d=7.6, h=2.2); }
+module outsideEnvelope(){ half=rack_open/2-rack_margin;
+  translate([body_w/2-half-50,-10,-10]) cube([50,260,70]); translate([body_w/2+half,-10,-10]) cube([50,260,70]); }
+if (test=="rack_width_margin") intersection(){ union(){ tray_left(); tray_right(); earHeads(); } outsideEnvelope(); }
 

@@ -26,6 +26,8 @@ brk_row_dz  = 23.8;    // vertical spacing of the two hole rows
 brk_col_dy  = 110;     // depth spacing of the two hole columns
 brk_len     = 139.4;   // bracket web length
 brk_t       = 1.5;     // bracket steel thickness
+rack_open   = 450.85;  // measured clear width between the front rails (#5)
+rack_margin = 2.0;     // minimum clearance per side, across the ear-bolt heads (D28)
 
 /* [Device] */
 dev_w = 182;
@@ -36,7 +38,7 @@ fit   = 1;
 /* [Structure] */
 wall_o   = 11;    // outer wall — carries the M4 ear-bolt pockets
 wall_i   = 8;     // inner wall — carries the keystone, tie-plate and lip screws
-key_w    = 36;
+key_w    = 33;    // narrowest the braced, rotated jacks allow (D28)
 floor_t  = 3;
 tray_d   = 206;
 pad_t    = 3;
