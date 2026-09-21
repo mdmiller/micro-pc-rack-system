@@ -9,8 +9,8 @@ TESTS="tray_keystone_L:zero tray_keystone_R:zero tray_lip_L:zero tray_lip_R:zero
 tray_stop_L:zero tray_stop_R:zero trays_tie:zero tray_bricks_L:zero tray_bricks_R:zero
 tray_device_L:zero tray_device_R:zero tray_tray:zero keystone_tie:zero
 pullout_L:zero pullout_R:zero lip_blocks_L:block lip_blocks_R:block
-lip_holes_L:zero lip_holes_R:zero pilot_vs_channel:zero lip_clear_of_face:zero
-m4_nut_fits:zero m4_bolt_fits:zero
+lip_holes_L:zero lip_holes_R:zero pilot_vs_pocket:zero lip_clear_of_face:zero
+m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block
 bb_tab_rooted_L:block"
 fail=0
 for t in $TESTS; do

@@ -19,7 +19,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-20 | Second prior-art pass; the closest public design examined in detail. |
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
-| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21). |
+| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22). |
 
 ---
 
@@ -97,6 +97,7 @@ loose nuts. Each outer wall instead carries two M4 nut channels running front to
 Consequences: outer wall 11 mm; M4 × 8 **button head** (a longer bolt bottoms out,
 a socket head fouls the rail); body 442 mm, leaving 2.5 mm per side in a 450 mm
 opening. Verified: an M4 hex nut seats in the channel and the bolt clears.
+**Superseded by D22:** the nuts could never be loaded into the channels.
 
 ### D10 — Centre tie at front and rear
 Keystone module (front) and tie plate (rear) both bolt across the two inner walls.
@@ -230,3 +231,36 @@ Why the checks missed it: every existing test is an intersection between two par
 and a part that falls apart into two bodies doesn't collide with anything. New test
 `bb_tab_rooted_L` requires the space under the inner tab to be solid; it fails on
 v3.1 and passes now.
+
+### D22 — Ear nut channels couldn't be loaded; replaced with per-bolt pockets (2026-09-21)
+D9's channels were sealed at both ends. They run y 8–165 inside a wall that runs
+6–206, so the "slide the nuts in from the rear" step had 41 mm of solid wall in the way.
+The only opening was the 4.8 mm bolt slot on the outside face. A 7 mm nut passes that
+only lying flat, and the 4 mm-deep pocket has no room to stand it up. Sweeping the
+`m4_nut_fits` nut out of its seat towards the bay, the outside, the rear and the front
+hits wall every time. Each channel roof was also a 157 mm unsupported bridge when
+printed floor-down.
+
+Fix: four pockets per tray, one per bracket hole, each open to the bay. A washer and
+nut go in from inside before the machine does; the bolt comes in from outside through
+a slot that keeps ±8 mm of fore-aft travel (`ear_c0`, `ear_travel`), so the
+bracket's column position still needn't be exact. The longest roof is now a 25.6 mm
+bridge supported at both ends.
+
+- **Washer:** it spreads the clamp load off the strips of skin beside the slot. The
+  old nut bore on two 1.1 mm strips.
+- **No anti-rotation:** a stepped pocket that would stop the nut spinning was tried and
+  dropped. A 9 mm washer can't pass a 7.3 mm nut opening or be turned upright inside
+  one, so the pocket is washer-sized and the nut is held while tightening.
+- **Bolts:** now M4 × 12. Through 1.5 mm steel, 6.5 mm skin and a 0.8 mm washer, the
+  tip lands flush with the nut face, 0.5 mm short of the bay.
+- **Lip pilot:** the outer lip pilot keeps D19's rule and stops 1 mm short of the new
+  front pockets.
+
+Why the checks missed it: `m4_nut_fits` placed a nut in its final position and
+confirmed it fit. It never asked how the nut got there. Replaced by:
+- `m4_hw_seated`: bolt, washer and nut at both ends of travel in all four holes.
+- `m4_hw_insertable`: washer and nut swept in from the bay.
+- `m4_past_travel`: the same hardware 4 mm past the end of travel must hit wall, which
+  proves the other two can fail.
+

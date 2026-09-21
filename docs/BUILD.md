@@ -35,8 +35,9 @@ about creep in a warm rack over months, not about strength.
 
 **Rack mounting**
 - 2 × steel 1U rack ear brackets (Penn-Elcom R1206/1U or equivalent, ~$5.50 each)
-- 8 × M4 × 8 button head — anything taller than a button head fouls the rail
+- 8 × M4 × 12 button head — anything taller than a button head fouls the rail
 - 8 × M4 hex nuts (7.0 mm across flats, 3.2 thick — standard DIN 934)
+- 8 × M4 washers (9 mm OD, 0.8 thick — standard DIN 125)
 - 4 × rack screws + cage nuts for the brackets themselves
 
 **Assembly**
@@ -52,20 +53,23 @@ about creep in a warm rack over months, not about strength.
 - 2 × short video cables, PC rear port to the back of the jack
 - 4 × velcro straps for the power bricks
 
-## The nut channels
+## The ear bolts
 
-Each outer wall carries two channels running front-to-back at z = 9.7 and 33.5 mm,
-matching the bracket's two hole rows (9.4 mm up from the bracket's bottom edge, 23.8 mm
-apart). Slide two M4 nuts into each channel from the rear, then bolt through the
-bracket's Ø4.8 holes from outside.
+Each outer wall has four pockets, one per bracket hole, at z = 9.7 and 33.5 mm to match
+the bracket's two hole rows (9.4 mm up from the bracket's bottom edge, 23.8 mm apart) and
+110 mm apart front to back. Each pocket opens into the bay: drop a washer and nut in from
+inside, then bolt through the bracket's Ø4.8 hole from outside. An M4 × 12 lands flush
+with the nut face and stops 0.5 mm short of the bay.
 
-Because the bolts run in a continuous channel rather than fixed holes, the bracket's hole
-column position doesn't need to be known in advance — and you can slide the whole shelf
-fore and aft to set how far it sits proud of the rack face.
+The bolt passes through a slot rather than a hole, giving ±8 mm of fore-aft travel. The
+bracket's hole column position doesn't need to be exact, and you can slide the shelf to
+set how far it sits proud of the rack face. The pocket is sized for the washer, so the
+nut can turn: hold it with a finger or a 7 mm spanner while you tighten.
 
 ## Assembly
 
-1. Slide four M4 nuts into each tray's channels and bolt the steel ears on loosely.
+1. Drop a washer then a nut into each of the four pockets in each tray's outer wall, from
+   inside the bay, and bolt the steel ears on loosely.
 2. Drop the keystone module between the two tray fronts; screw its top flange into both
    inner walls. Fit the tie plate at the rear the same way.
 3. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
@@ -92,7 +96,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 |---|---|---|
 | `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope; `dev_h` also sets the rear stop hook height |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
-| `wall_o` | 11 | outer wall; must stay thick enough to hold the nut channel |
+| `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
+| `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
 

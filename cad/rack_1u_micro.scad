@@ -34,7 +34,7 @@ dev_h = 36;
 fit   = 1;
 
 /* [Structure] */
-wall_o   = 11;    // outer wall — carries the M4 nut channels
+wall_o   = 11;    // outer wall — carries the M4 ear-bolt pockets
 wall_i   = 8;     // inner wall — carries the keystone, tie-plate and lip screws
 key_w    = 36;
 floor_t  = 3;
@@ -43,13 +43,12 @@ pad_t    = 3;
 flange_t = 3;
 flange_l = 30;
 
-/* [M4 nut channel] */
-ch_depth = 4.0;   // nut pocket depth into the wall
-ch_h     = 7.6;   // nut across-flats + clearance
-ch_x0    = 3.4;   // slot depth before the pocket starts
-slot_h   = 4.8;   // M4 clearance slot height
-ch_y0    = 8;
-ch_y1    = 165;
+/* [M4 ear bolts] */
+wsh_d    = 9.0;   // M4 washer (DIN 125); the pocket is sized to it
+skin_t   = 6.5;   // solid outer skin the bolt passes through
+bolt_slot = 4.5;  // M4 clearance slot height
+ear_c0   = 22;    // first bracket hole column at mid-travel, from the rack face
+ear_travel = 16;  // fore-aft adjustment of the shelf against the bracket
 
 /* [Keystone] */
 ks_w  = 19.3;     // aperture, rotated 90 deg (stacked pair)
@@ -109,10 +108,18 @@ module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(
 // =====================================================================
 //  TRAY
 // =====================================================================
-module nut_channels() {
-  for (z = brk_z) {
-    translate([ch_x0, ch_y0, z-ch_h/2])   cube([ch_depth, ch_y1-ch_y0, ch_h]);
-    translate([-1,   ch_y0, z-slot_h/2])  cube([ch_x0+1.1, ch_y1-ch_y0, slot_h]);
+// One pocket per bracket hole, open to the bay: washer and nut go in from
+// inside before the PC does, the bolt comes in from outside through the slot.
+// Every roof is a short bridge. The washer spreads the clamp load off the
+// thin strips of skin either side of the slot.
+ear_y_min = ear_c0 - ear_travel/2 - wsh_d/2 - 0.3;   // front edge of the front pockets
+module ear_pockets() {
+  for (z = brk_z, c = [0,1]) {
+    y0 = ear_c0 + c*brk_col_dy - ear_travel/2;
+    translate([-1, y0-bolt_slot/2, z-bolt_slot/2])
+      cube([skin_t+1+eps, ear_travel+bolt_slot, bolt_slot]);            // bolt slot
+    translate([skin_t, y0-wsh_d/2-0.3, z-(wsh_d+0.3)/2])
+      cube([wall_o-skin_t+1, ear_travel+wsh_d+0.6, wsh_d+0.3]);         // washer + nut
   }
 }
 
@@ -145,10 +152,10 @@ module tray_left() {
     }
     yprism(bay_x0+bay_w/2, (open_z0+open_z1)/2, panel_t+2*eps)
       rr(bay_w, open_z1-open_z0, 2);                                     // PC face opening
-    nut_channels();
+    ear_pockets();
     for (x=lip_scr_x)                                                    // front lip pilots
       translate([x, -eps, lip_scr_z]) rotate([-90,0,0])                  // outer stops short
-        cylinder(d=d_pilot, h=(x < wall_o) ? ch_y0-1 : 9);               // of the nut channel
+        cylinder(d=d_pilot, h=(x < wall_o) ? ear_y_min-1 : 9);           // of the ear pocket
     for (y=scr_y)                                                        // keystone flange
       translate([seam_l-wall_i/2, y, wall_hi-16]) cylinder(d=d_pilot, h=17);
     for (y=tie_y)                                                        // tie plate
