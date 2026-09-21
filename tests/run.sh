@@ -13,7 +13,8 @@ lip_holes_L:zero lip_holes_R:zero pilot_vs_pocket:zero lip_clear_of_face:zero
 m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block
 bb_tab_rooted_L:block
 tray_cf:zero keystone_cf:zero tie_cf:zero bricks_cf:zero cf_holes:zero ziptie_void:zero
-rear_face_open_L:zero stop_meets_face_L:block"
+rear_face_open_L:zero stop_meets_face_L:block
+stop_screws_L:zero stop_screws_R:zero keystone_side_clear:zero"
 fail=0
 for t in $TESTS; do
   name=${t%%:*}; kind=${t##*:}
