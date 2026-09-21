@@ -54,8 +54,17 @@ about creep in a warm rack over months, not about strength.
 - All M3 threads directly into 2.7 mm printed pilots. No inserts anywhere.
 
 **Other**
-- 2 × keystone couplers, HDMI or DP female-female (mix freely, the apertures are identical)
-- 2 × short video cables, PC rear port to the back of the jack
+- 2 × keystone couplers, female-female: HDMI or mini-DisplayPort, one per machine
+- 2 × video cables, PC rear port to the back of the jack. **The plug heads must be
+  small.** The jacks are rotated, so each rear plug stands on its long edge, and the two
+  sit on 18.8 mm centres. Use one of:
+  - slim-head HDMI, passive, head ≤ 16 mm wide (e.g. Monoprice Ultra Slim, Cable Matters
+    Ultra Thin);
+  - mini-DP couplers with DP ↔ mini-DP cables (the machines keep their full-size DP ports).
+
+  Standard-head HDMI or DP plugs (~21 mm) collide with each other and with the keystone
+  flange. A standard HDMI plug fits only in the **lower** jack, with a mini-DP above it,
+  and then the cable floor has to start at ~85–90 mm (`cf_y0`). See D26.
 - 4 × velcro straps for the power bricks
 - Small zip ties (up to 4 mm wide) for the DC and video leads
 
@@ -122,7 +131,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 |---|---|---|
 | `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope |
 | `stop_h` | 8 | how far up the rear face the rear stop reaches |
-| `cf_y0` | 44 | where the cable floor starts; the lower video plug has to clear it |
+| `cf_y0` | 50 | where the cable floor starts; the lower rear video plug's head has to clear it |
+| `ks_relief_d`, `ks_relief_w` | 1.0, 9 | relief in the keystone flange underside over the upper rear plug |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |

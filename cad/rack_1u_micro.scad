@@ -56,13 +56,15 @@ ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
 ks_clr = 0.3;     // side clearance of the keystone panel in the gap between trays
+ks_relief_d = 1.0;  // relief in the flange underside over the upper rear video plug,
+ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
 
 /* [Rear stop] */
 stop_h = 8;       // top of the stop face above the tray floor; the stop touches
                   // only this band of the rear face, so any port layout clears it
 
 /* [Cable floor] */
-cf_y0   = 44;     // starts behind the keystone jack bodies
+cf_y0   = 50;     // starts behind the lower rear video plug's head (slim HDMI, D26)
 cf_ext  = 16;     // overhang past the tray rear, into the gap between brick bays
 cf_t    = 3;
 ledge_w = 6;      // ledge on each inner wall that carries the cable floor
@@ -114,7 +116,7 @@ lip_scr_z = floor_t + lip_tab_h/2;
 bb_d    = bb_front + bb_depth + bb_rear;
 cf_w    = key_w - 0.6;
 cf_len  = tray_d + cf_ext - cf_y0;
-cf_scr_y = [54, 112, 170];          // clear of the keystone flange and tie plate
+cf_scr_y = [58, 112, 170];          // clear of the keystone flange and tie plate
 
 module rr(w,h,r=2) { offset(r=r) square([w-2*r,h-2*r],center=true); }
 module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(len) children(); }
@@ -200,6 +202,8 @@ module keystone() {
       translate([seam_l-wall_i, panel_t, wall_hi])
         cube([key_w+2*wall_i, flange_l, flange_t]);
     }
+    translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi-eps])    // plug relief, clear of
+      cube([ks_relief_w, flange_l-ks_wall+eps, ks_relief_d+eps]);      // the panel joint at y=6
     for (z = ks_z) {
       yprism(body_w/2, z, panel_t+2*eps) square([ks_w, ks_h], center=true);
       translate([body_w/2, ks_wall, z]) rotate([-90,0,0])

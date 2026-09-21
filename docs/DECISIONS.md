@@ -21,6 +21,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
 | 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23); fastener lengths, keystone clearance and assembly order corrected (D24). |
 | 2026-09-21 | OpenSCAD pinned to 2026.09.18 (D25). |
+| 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
 
 ---
 
@@ -50,7 +51,7 @@ per tray is safe, at the cost of a 2 mm asymmetry in the front frame.
 Two jacks, one per machine, for DP/HDMI couplers. Networking stays at the rear.
 In v3 the jacks are rotated 90° and stacked: the thicker outer walls (D9) cost 12 mm
 of width that had to come from the centre column, and side-by-side jacks would have
-left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3 and 36 in v3.1 (D19).
+left 2.6 mm edges. Stacked needs ~29 mm; the column is 40 in v3 and 36 in v3.1 (D19). Rear-plug clearance for this layout: D26.
 
 ---
 
@@ -338,4 +339,43 @@ shape. Pinned to 2026.09.18, the version the owner already had and the current
 Homebrew `openscad@snapshot`. `build.sh` warns on a mismatch rather than failing,
 because a mismatched build is still geometrically correct, just noisy in git. The
 2021.01 stable release was never in use here.
+
+### D26 — Rear video plug clearance (2026-09-21, issue #6)
+The rotated, stacked jacks (D4) put each rear plug on its long edge, 18.8 mm apart,
+between the keystone flange above (underside at z = 39, back to y = 36) and the
+cable floor below. Plugs were modelled as blocks at two coupler depths (rear face 24
+and 32 mm behind the panel front):
+
+- **Standard HDMI or DP heads (~21 × 11 × 40 mm)** collide with each other, the
+  flange and the cable floor under every small change considered. The two plugs alone
+  overlap by ~1000 mm³.
+- **Slim HDMI heads (16 × 6.6 × 14 mm)** missed by ~0.2 mm per side at the flange and
+  hit the cable floor at the deeper coupler depth.
+- **Mini-DP** is smaller still.
+
+Three ways to make 2 × slim HDMI fit were compared:
+
+| Option | Upper plug to flange | Plug to plug | Cost |
+|---|---|---|---|
+| `ks_gap` 4 → 3 | 0.3 mm | 1.8 mm | halves the full-thickness plastic between the jacks (2 → 1 mm) |
+| **1 mm relief in the flange underside** | 0.8 mm | 2.8 mm | flange 2 mm thick instead of 3 over a 9 mm-wide strip |
+| Move the flange back | — | — | restructures the keystone module for no extra gain |
+
+Chosen: the relief (`ks_relief_d` = 1.0, `ks_relief_w` = 9). It starts behind the
+panel at y = 8.8, so the panel-to-flange joint is untouched. `cf_y0` goes from 44 to 50
+so the lower plug's head clears the floor. The first cable-floor screw pair moves
+54 → 58 to keep its edge distance.
+
+**Supported cables:**
+- 2 × slim HDMI (passive; active RedMere cables may not like a passive coupler);
+- 2 × mini-DP;
+- one of each;
+- mini-DP upper with standard HDMI lower, provided `cf_y0` goes to ~85–90.
+
+Standard-head cables in both jacks would need the jacks turned upright and the flange
+cut away over them. That's a different layout, not taken.
+
+Tests: `plug_vs_keystone`, `plug_vs_cf` and `plug_vs_plug` check both jacks at both
+coupler depths. The first two failed before this change. `flange_over_relief` checks
+that 2 mm of flange remains.
 

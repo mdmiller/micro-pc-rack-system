@@ -87,3 +87,16 @@ if (test=="stop_screws_R")    intersection(){ tray_right(); stopRods(body_w-bay_
 // the keystone panel must keep >= 0.25 mm each side between the tray panels
 if (test=="keystone_side_clear") intersection(){ keystone();
   union(){ translate([0.25,0,0]) tray_left(); translate([-0.25,0,0]) tray_right(); } }
+// Rear video plugs (D26). The jacks are rotated, so each plug stands on its long edge.
+// Slim HDMI head 16 x 6.6 x 14 mm; coupler rear face 24 or 32 mm behind the panel
+// front (couplers vary), so both depths are checked.
+module plug(zc,yf) translate([body_w/2-3.3, yf, zc-8]) cube([6.6, 14, 16]);
+module plugs(yf) { plug(ks_z[0],yf); plug(ks_z[1],yf); }
+if (test=="plug_vs_keystone") intersection(){ keystone(); union(){ plugs(24); plugs(32); } }
+if (test=="plug_vs_cf")       intersection(){ cfP(); union(){ plugs(24); plugs(32); } }
+if (test=="plug_vs_plug")     union(){ intersection(){ plug(ks_z[0],24); plug(ks_z[1],24); }
+                                       intersection(){ plug(ks_z[0],32); plug(ks_z[1],32); } }
+// the relief must not break through: 2 mm of flange stays over it
+if (test=="flange_over_relief") intersection(){ keystone();
+  translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi+ks_relief_d]) cube([ks_relief_w, flange_l-ks_wall, flange_t-ks_relief_d]); }
+
