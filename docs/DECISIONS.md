@@ -19,6 +19,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-20 | Second prior-art pass; the closest public design examined in detail. |
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
+| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21). |
 
 ---
 
@@ -213,3 +214,19 @@ and nut and bolt fit. The alignment tests were confirmed to fail both on the
 shipped v3 and on a deliberately broken lip.
 
 **The v3 files shared before this repo existed have these defects. Use this repo.**
+
+### D21 — Brick bay inner mounting tab floated above the floor (2026-09-21)
+Found by counting connected solids in the exported mesh: `brick_bay` was two
+separate bodies. Both front mounting tabs started at z = 8. The outer one overlaps
+the outer lip beneath it (12 mm tall), so it was fused. The inner edge is the open
+cable-run side and has no lip, so the inner tab hung 4 mm above the 4 mm floor with
+nothing joining them. It sliced as an unsupported island, and it carries one of the
+two bolts that hold each bay to its tray.
+
+Fix: both tabs now run from the floor (z 0–32). The outer tab is unchanged in the
+union, because it already sat inside the lip.
+
+Why the checks missed it: every existing test is an intersection between two parts,
+and a part that falls apart into two bodies doesn't collide with anything. New test
+`bb_tab_rooted_L` requires the space under the inner tab to be solid; it fails on
+v3.1 and passes now.

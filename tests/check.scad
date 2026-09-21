@@ -49,3 +49,6 @@ if (test=="pilot_vs_channel") intersection(){ outerPilot(); nutChannels(); }
 if (test=="lip_clear_of_face")intersection(){ lipL(); openingAboveLip(); }
 if (test=="m4_nut_fits")      intersection(){ tray_left(); m4nut(40); }
 if (test=="m4_bolt_fits")     intersection(){ tray_left(); m4x8(40); }
+// the brick bay's inner mounting tab must reach the floor (it once floated 4 mm above it)
+module innerTabRoot(){ translate([seam_l-wall_i, tray_d, floor_t+1]) cube([wall_i, 4, 8-(floor_t+1)]); }
+if (test=="bb_tab_rooted_L")  intersection(){ bbL(); innerTabRoot(); }

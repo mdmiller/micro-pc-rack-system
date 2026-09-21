@@ -241,7 +241,8 @@ module brick_bay() {
       cube([wall_o, bb_d, bb_lip]);                          // outer lip
       translate([0, bb_d-bb_rear, 0]) cube([seam_l, bb_rear, bb_lip]);  // rear lip
       for (x=[0, seam_l-wall_i])                             // front mounting tabs
-        translate([x, 0, 8]) cube([x==0?wall_o:wall_i, 4, 24]);
+        translate([x, 0, 0]) cube([x==0?wall_o:wall_i, 4, 32]); // from the floor: the
+                                                               // inner edge has no lip
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
     for (x=[30,70,110,150], y=[18, 93])                      // velcro strap slots

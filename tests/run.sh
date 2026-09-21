@@ -10,7 +10,8 @@ tray_stop_L:zero tray_stop_R:zero trays_tie:zero tray_bricks_L:zero tray_bricks_
 tray_device_L:zero tray_device_R:zero tray_tray:zero keystone_tie:zero
 pullout_L:zero pullout_R:zero lip_blocks_L:block lip_blocks_R:block
 lip_holes_L:zero lip_holes_R:zero pilot_vs_channel:zero lip_clear_of_face:zero
-m4_nut_fits:zero m4_bolt_fits:zero"
+m4_nut_fits:zero m4_bolt_fits:zero
+bb_tab_rooted_L:block"
 fail=0
 for t in $TESTS; do
   name=${t%%:*}; kind=${t##*:}
