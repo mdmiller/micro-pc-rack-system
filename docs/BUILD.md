@@ -115,11 +115,18 @@ the U above blocks access from the top.
 
 ## Servicing
 
-Undo two screws, lift the front lip off, and the machine slides out the front — but only
-as far as its rear cables allow. Reaching the rear ports from the front means pulling the
-machine out about 190 mm, so each rear cable needs that much free slack. Otherwise it has
-to be unplugged from the rear of the rack first. How that slack is stored is still an open
-question.
+To remove a machine:
+
+1. From behind the rack, unplug its rear cables (power, video, network). The ports are
+   about 130 mm into the shelf, past the brick, so it's a tight reach, but a rare one.
+2. Undo the two front-lip screws, lift the lip off, and slide the machine out the front.
+
+To refit, do the reverse: slide the machine in until it meets the rear stop, refit the
+lip, and reconnect its cables from behind.
+
+The shelf doesn't store service loops. These machines have no hot-swappable parts, so
+there's no reason to pull one while it's running, and pulling a machine out with its
+cables attached would need ~200 mm of slack per cable that the bay has no room for.
 
 The rear stop stays put. It's a set-once adjustment, not a service item.
 

@@ -116,6 +116,14 @@ it needs support in the centre once racked (see prior-art.md).
 In a tightly packed rack, pulling the whole shelf to service one machine is not
 acceptable. Since the corridor was already clear (D2), v3 only needed a front stop.
 
+**Servicing procedure (2026-09-21, issue #7):** a machine's rear cables are unplugged
+from behind the rack before it slides out the front. Pulling it out with cables still
+attached would need ~200 mm of free slack on each rear cable. Behind each machine, the
+bay has only ~8–27 mm of free depth left after the rear plugs and the brick, and
+building in room for service loops would lengthen the shelf. The machines have no
+hot-swappable parts, so a rare, tight reach from behind was judged the simpler
+trade-off.
+
 ### D12 — Front lip instead of clips
 Per-bay clips were planned, but there's no structural material inside the full-width
 opening to anchor them. The lip spans the opening and screws into the two wall strips
