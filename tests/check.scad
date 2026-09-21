@@ -65,7 +65,7 @@ if (test=="bb_tab_rooted_L")  intersection(){ bbL(); innerTabRoot(); }
 // cable floor, rear stop band, zip-tie clearance
 module cfP(){ translate([seam_l+0.3,cf_y0,ledge_h]) cable_floor(); }
 module cfRods(){ for(x=[seam_l+ledge_w/2, seam_r-ledge_w/2], y=cf_scr_y)      // M3 x 6 cores
-  translate([x,y,ledge_h+cf_t-6]) cylinder(d=2.0,h=6); }
+  translate([x,y,ledge_h+cf_t-6]) cylinder(d=2.6,h=6); }
 module zipVoid(){ translate([seam_l+ledge_w+0.5,cf_y0,0]) cube([key_w-2*ledge_w-1,tray_d-cf_y0,ledge_h]); }
 module rearFaceAbove(){ translate([bay_x0+fit,panel_t+dev_d,floor_t+stop_h]) cube([dev_w,1,dev_h-stop_h]); }
 module rearFaceBand(){  translate([bay_x0+fit,panel_t+dev_d,floor_t]) cube([dev_w,1,stop_h]); }
@@ -77,3 +77,13 @@ if (test=="cf_holes")         intersection(){ union(){ tray_left(); tray_right()
 if (test=="ziptie_void")      intersection(){ union(){ tray_left(); tray_right(); keystone(); cfP(); } zipVoid(); }
 if (test=="rear_face_open_L") intersection(){ stopL(); rearFaceAbove(); }
 if (test=="stop_meets_face_L")intersection(){ stopL(); rearFaceBand(); }
+
+// Screw cores are 2.6 mm: inside a 2.7 pilot they measure zero, but a tip that runs
+// past the pilot bottom into the skin below shows up above the 2 mm3 threshold.
+// M3 x 8 (the BOM screw) plus 0.5 mm, so the tip still clears if the 3 mm foot prints thin
+module stopRods(cx){ for(dx=[-20,20]) translate([cx+dx,ret_y,floor_t+2*pad_t-8.5]) cylinder(d=2.6,h=8.5); }
+if (test=="stop_screws_L")    intersection(){ tray_left();  stopRods(bay_cx); }
+if (test=="stop_screws_R")    intersection(){ tray_right(); stopRods(body_w-bay_cx); }
+// the keystone panel must keep >= 0.25 mm each side between the tray panels
+if (test=="keystone_side_clear") intersection(){ keystone();
+  union(){ translate([0.25,0,0]) tray_left(); translate([-0.25,0,0]) tray_right(); } }

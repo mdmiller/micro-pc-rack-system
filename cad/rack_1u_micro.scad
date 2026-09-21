@@ -55,6 +55,7 @@ ks_w  = 19.3;     // aperture, rotated 90 deg (stacked pair)
 ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
+ks_clr = 0.3;     // side clearance of the keystone panel in the gap between trays
 
 /* [Rear stop] */
 stop_h = 8;       // top of the stop face above the tray floor; the stop touches
@@ -175,7 +176,7 @@ module tray_left() {
     for (y=tie_y)                                                        // tie plate
       translate([seam_l-wall_i/2, y, wall_hi-16]) cylinder(d=d_pilot, h=17);
     for (dx=[-20,20])                                                    // rear stop
-      translate([bay_cx+dx, ret_y, 1]) cylinder(d=d_pilot, h=floor_t+pad_t);
+      translate([bay_cx+dx, ret_y, 0.6]) cylinder(d=d_pilot, h=floor_t+pad_t);  // M3 x 8 tip clears
     for (x=[wall_o/2, seam_l-wall_i/2])                                  // brick-bay pilots
       translate([x, tray_d-14, 20]) rotate([-90,0,0]) cylinder(d=d_pilot, h=15);
     for (y=cf_scr_y)                                                     // cable floor
@@ -195,7 +196,7 @@ ks_z = [panel_h/2 - (ks_h+ks_gap)/2, panel_h/2 + (ks_h+ks_gap)/2];
 module keystone() {
   difference() {
     union() {
-      translate([seam_l, 0, 0]) cube([key_w, panel_t, panel_h]);
+      translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, panel_t, panel_h]);
       translate([seam_l-wall_i, panel_t, wall_hi])
         cube([key_w+2*wall_i, flange_l, flange_t]);
     }

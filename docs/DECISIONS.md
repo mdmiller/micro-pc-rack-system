@@ -19,7 +19,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-20 | Second prior-art pass; the closest public design examined in detail. |
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
-| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23). |
+| 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23); fastener lengths, keystone clearance and assembly order corrected (D24). |
 
 ---
 
@@ -297,4 +297,34 @@ New tests:
 - `ziptie_void`: the gap under the floor is clear.
 - `rear_face_open_L`: nothing touches the rear face above the curb.
 - `stop_meets_face_L`: the curb does meet the face.
+
+### D24 — Fastener lengths, keystone clearance, assembly order, supports (2026-09-21)
+Found by working through every screw (reach, length, engagement), every assembly step
+(possible in this order, in a rack?) and every part (printable as exported?):
+
+- **Rear-stop screws broke through.** The BOM's M3 × 10, through the 3 mm foot into
+  6 mm of pad and floor, stuck 1 mm out of the underside into the U below. Now M3 × 8,
+  and the pilot starts at z = 0.6 so the flat tip clears the pilot bottom instead of
+  meeting it. The test models the screw 0.5 mm long to keep that margin, which catches
+  both the old pilot and the old screw.
+- **The keystone panel had zero clearance:** 36.0 mm in a 36.0 mm gap between the tray
+  panels. Now 35.4 mm (`ks_clr` = 0.3 per side, the same as the cable floor).
+- **Assembly order.** Tightening the ear bolts and setting the rear stops after racking
+  isn't possible with the U above populated: the nuts and stop screws are reached from
+  above, and the bolt heads sit between the bracket and the rail. All of that, plus
+  fitting the couplers and plugging in the video leads, now happens on the bench. The
+  couplers go in first, with the panel backed up, because the installed panel hangs
+  from a 36 × 3 mm joint loaded across the print layers. The shelf is racked empty and
+  the machines slide in from the front.
+- **Supports.** The strip above each PC opening is a 184 mm unsupported span when
+  printed floor-down, so the trays need supports there. "No supports" was wrong.
+- **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
+  headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
+  That corrects D15.
+
+New tests:
+- `stop_screws_L` / `_R`: fail on v3.1, pass now.
+- `keystone_side_clear`: fails on v3.1 with 131 mm³ of overlap, passes now.
+- `cf_holes`: now uses 2.6 mm cores, so a tip that runs through a pilot's skin shows up
+  above the 2 mm³ threshold.
 

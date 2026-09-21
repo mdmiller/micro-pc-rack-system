@@ -26,8 +26,11 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
 
-Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Everything prints in
-the orientation it's exported in, no supports. Roughly 590 cm³ / 450 g of filament.
+Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Print everything in the
+orientation it's exported in. **The trays need support under the strip above each PC
+opening**: it spans 184 mm with nothing beneath it. Supports from the build plate are
+enough, and nothing else on the trays needs them. The other parts print without supports.
+Roughly 640 cm³ / 490 g of filament.
 
 **PETG, ASA or PC-blend — not PLA.** Root bending stress is only 0.73 MPa, so this is
 about creep in a warm rack over months, not about strength.
@@ -44,7 +47,7 @@ about creep in a warm rack over months, not about strength.
 **Assembly**
 - 4 × M3 × 16 countersunk — keystone module
 - 4 × M3 × 16 countersunk — tie plate
-- 4 × M3 × 10 pan — rear stops
+- 4 × M3 × 8 pan — rear stops
 - 4 × M3 × 16 pan — brick bays to trays
 - 6 × M3 × 6 pan — cable floor to ledges
 - 4 × M3 × 8 pan head — front lips
@@ -71,28 +74,43 @@ nut can turn: hold it with a finger or a 7 mm spanner while you tighten.
 
 ## Assembly
 
-1. Drop a washer then a nut into each of the four pockets in each tray's outer wall, from
+Everything up to racking happens on the bench. Once the shelf is racked, the ear bolts,
+the nuts, the rear-stop screws and the backs of the keystones can't be reached, because
+the U above blocks access from the top.
+
+1. Fit the keystone couplers first. Lay the keystone module face-down on a flat surface
+   and press the couplers in until they click. Once installed, the panel hangs from its
+   top edge only, so don't push couplers into it afterwards.
+2. Drop a washer then a nut into each of the four pockets in each tray's outer wall, from
    inside the bay, and bolt the steel ears on loosely.
-2. Drop the keystone module between the two tray fronts; screw its top flange into both
+3. Drop the keystone module between the two tray fronts; screw its top flange into both
    inner walls. Fit the tie plate at the rear the same way.
-3. Slide the cable floor in from the rear onto the two ledges between the trays and screw
+4. Slide the cable floor in from the rear onto the two ledges between the trays and screw
    it down (6 screws, all reachable from above).
-4. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
-5. Push the keystone couplers in from the front until they click.
-6. Rack it, then tighten the M4s once the depth looks right.
-7. Slide each PC in from the front. Slide its rear stop forward until it touches the
-   bottom of the rear face, tighten, then fit the front lip.
+5. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
+6. Set the depth: slide the shelf along the bracket slots until its front sits where you
+   want it relative to the ear legs, then tighten all eight M4s, holding each nut from
+   inside the bay.
+7. Set the rear stops: slide each machine in from the front, push its rear stop forward
+   against the bottom of the rear face, tighten, then slide the machine back out.
 8. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
-   centre. Strap them down. DC leads run forward to each machine's power jack; coil the
-   slack in the free two-thirds of the bay.
-9. Video leads go inboard behind the tray, into the centre gap, then forward along the
-   cable floor to the back of the keystones. Zip-tie them to the slot pairs in the cable
-   floor and the anchors along the inboard edge of each brick bay.
+   centre. Keep the front ~25 mm of the bay clear for the machines' rear plugs. The velcro
+   straps pass under the bay floor and over the brick. Thread them now.
+9. Plug the video leads into the backs of the couplers (reachable only from above), run
+   them back along the cable floor and through the centre gap, and zip-tie them to the
+   slot pairs in the cable floor and the anchors along the inboard edge of each brick bay.
+10. Rack the shelf empty.
+11. Slide each machine in from the front, connect its rear cables, and fit the front lip.
 
 ## Servicing
 
-Undo two screws, lift the front lip off, and the machine slides straight out the front.
-The rear stop stays put — it's a set-once adjustment, not a service item.
+Undo two screws, lift the front lip off, and the machine slides out the front — but only
+as far as its rear cables allow. Reaching the rear ports from the front means pulling the
+machine out about 190 mm, so each rear cable needs that much free slack. Otherwise it has
+to be unplugged from the rear of the rack first. How that slack is stored is still an open
+question.
+
+The rear stop stays put. It's a set-once adjustment, not a service item.
 
 ## Customising
 
@@ -117,8 +135,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
   plenum, an open vent grid under the bricks and an open rear, but two adapters sitting in
   a 1U exhaust stream is not a configuration I can promise runs cool. If it does run hot,
   the brick bays unbolt and move to their own U without touching anything else.
-- The Lenovo brick's 35 mm thickness leaves 6.5 mm of headroom in the U, so nothing can
-  sit on top of it. Straps pass under and around, not over.
+- The Lenovo brick is 35 mm thick and sits on a 4 mm bay floor, leaving about 5.5 mm of
+  headroom in the U: room for a velcro strap over the top, nothing more.
 - Verified against the bracket drawing, not against a bracket in hand. Check the 23.8 mm
   row spacing with calipers before printing both trays; it's a one-parameter fix.
 - Front-rail mounting only. The numbers say that's fine — 0.4 mm of creep deflection over
