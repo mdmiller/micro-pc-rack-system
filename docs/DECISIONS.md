@@ -20,6 +20,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Repo created. Verification found four defects in v3's front lip; fixed in v3.1 and a test suite added. |
 | 2026-09-21 | First git commit, at v3.1. Everything up to here was iterated in Claude Cowork sessions; from this point the work continues in Claude Code, with history in git. |
 | 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23); fastener lengths, keystone clearance and assembly order corrected (D24). |
+| 2026-09-21 | OpenSCAD pinned to 2026.09.18 (D25). |
 
 ---
 
@@ -327,4 +328,14 @@ New tests:
 - `keystone_side_clear`: fails on v3.1 with 131 mm³ of overlap, passes now.
 - `cf_holes`: now uses 2.6 mm cores, so a tip that runs through a pilot's skin shows up
   above the 2 mm³ threshold.
+
+### D25 — Pin the OpenSCAD version (2026-09-21)
+Different OpenSCAD versions tessellate curves differently. `canon_stl.py` only makes
+identical *triangles* byte-identical, so two contributors on different versions each
+rewrite every curved STL on every build. The review PRs (D21–D24) were built on
+2026.06.12, and three STLs then changed when rebuilt on 2026.09.18, with no change in
+shape. Pinned to 2026.09.18, the version the owner already had and the current
+Homebrew `openscad@snapshot`. `build.sh` warns on a mismatch rather than failing,
+because a mismatched build is still geometrically correct, just noisy in git. The
+2021.01 stable release was never in use here.
 
