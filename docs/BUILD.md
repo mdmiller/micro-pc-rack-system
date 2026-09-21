@@ -133,6 +133,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `stop_h` | 8 | how far up the rear face the rear stop reaches |
 | `cf_y0` | 50 | where the cable floor starts; the lower rear video plug's head has to clear it |
 | `ks_relief_d`, `ks_relief_w` | 1.0, 9 | relief in the keystone flange underside over the upper rear plug |
+| `ks_brace`, `ks_brace_w` | 12, 3.7 | keystone panel-to-flange braces; wider than 3.7 intrudes on latch travel |
+| `bb_brace`, `bb_brace_o` | 11, 4.5 | brick bay inner and outer tab braces; the inner one must stay below the M3 head at z 20 |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |

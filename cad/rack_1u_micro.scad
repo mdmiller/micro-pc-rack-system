@@ -59,6 +59,12 @@ ks_clr = 0.3;     // side clearance of the keystone panel in the gap between tra
 ks_relief_d = 1.0;  // relief in the flange underside over the upper rear video plug,
 ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
 
+/* [Braces] — D27 */
+ks_brace   = 12;   // keystone panel-to-flange braces, leg length
+ks_brace_w = 3.7;  // each sits in the strip outside the jacks, clear of latch travel
+bb_brace   = 11;   // brick bay inner tab brace; tops out below the M3 head at z 20
+bb_brace_o = 4.5;  // brick bay outer tab brace, above the outer lip
+
 /* [Rear stop] */
 stop_h = 8;       // top of the stop face above the tray floor; the stop touches
                   // only this band of the rear face, so any port layout clears it
@@ -201,6 +207,9 @@ module keystone() {
       translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, panel_t, panel_h]);
       translate([seam_l-wall_i, panel_t, wall_hi])
         cube([key_w+2*wall_i, flange_l, flange_t]);
+      for (x0=[seam_l+ks_clr, seam_r-ks_clr-ks_brace_w])             // braces: the panel
+        translate([x0,0,0]) rotate([90,0,90]) linear_extrude(ks_brace_w) // hangs from this joint
+          polygon([[panel_t,wall_hi],[panel_t,wall_hi-ks_brace],[panel_t+ks_brace,wall_hi]]);
     }
     translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi-eps])    // plug relief, clear of
       cube([ks_relief_w, flange_l-ks_wall+eps, ks_relief_d+eps]);      // the panel joint at y=6
@@ -285,6 +294,10 @@ module brick_bay() {
       for (x=[0, seam_l-wall_i])                             // front mounting tabs
         translate([x, 0, 0]) cube([x==0?wall_o:wall_i, 4, 32]); // from the floor: the
                                                                // inner edge has no lip
+      translate([seam_l-wall_i,0,0]) rotate([90,0,90]) linear_extrude(wall_i)   // tab braces
+        polygon([[4,floor_t+1],[4,floor_t+1+bb_brace],[4+bb_brace,floor_t+1]]);
+      rotate([90,0,90]) linear_extrude(wall_o)
+        polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
     for (x=[30,70,110,150], y=[18, 93])                      // velcro strap slots

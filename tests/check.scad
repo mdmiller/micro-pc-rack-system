@@ -99,4 +99,15 @@ if (test=="plug_vs_plug")     union(){ intersection(){ plug(ks_z[0],24); plug(ks
 // the relief must not break through: 2 mm of flange stays over it
 if (test=="flange_over_relief") intersection(){ keystone();
   translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi+ks_relief_d]) cube([ks_relief_w, flange_l-ks_wall, flange_t-ks_relief_d]); }
+// Braces (D27): present, and clear of latch travel and the bay screwdrivers
+if (test=="ks_braces_present")  intersection(){ keystone(); for (x0=[seam_l+ks_clr, seam_r-ks_clr-ks_brace_w])
+  translate([x0, panel_t, wall_hi-8]) cube([ks_brace_w, 3, 8]); }
+if (test=="bb_braces_present_L") intersection(){ bbL(); union(){
+  translate([seam_l-wall_i, tray_d+4, floor_t+2]) cube([wall_i, 4, 5]);
+  translate([0, tray_d+4, bb_lip]) cube([wall_o, 2, 2]); } }
+module latchZone() for (zc=ks_z) translate([body_w/2-ks_w/2-2.5, panel_t, zc-ks_h/2]) cube([ks_w+5, 30, ks_h]);
+if (test=="ks_latch_room")      intersection(){ keystone(); latchZone(); }
+module bayDrivers() for (x=[wall_o/2, seam_l-wall_i/2])   // M3 pan head + screwdriver along y
+  translate([x, tray_d+4, 20]) rotate([-90,0,0]) cylinder(d=6, h=bb_d);
+if (test=="bb_driver_clear_L")  intersection(){ bbL(); bayDrivers(); }
 

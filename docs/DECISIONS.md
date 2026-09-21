@@ -22,6 +22,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Independent review of v3.1 (Temple Keller). Brick bay inner tab found floating (D21); ear nut channels found impossible to load (D22); rear stop redesigned and a cable floor added (D23); fastener lengths, keystone clearance and assembly order corrected (D24). |
 | 2026-09-21 | OpenSCAD pinned to 2026.09.18 (D25). |
 | 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
+| 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
 
 ---
 
@@ -378,4 +379,35 @@ cut away over them. That's a different layout, not taken.
 Tests: `plug_vs_keystone`, `plug_vs_cf` and `plug_vs_plug` check both jacks at both
 coupler depths. The first two failed before this change. `flange_over_relief` checks
 that 2 mm of flange remains.
+
+### D27 — Brace the keystone panel and the brick bay tabs (2026-09-21, issue #11)
+Two parts behave like vertical posts loaded across their print layers. The numbers
+are hand calculations with rounded loads; the ratios are what matter.
+
+**Keystone panel.** It hangs from a 35.4 × 3 mm joint with the flange. The module
+prints panel-down, so that joint is a layer boundary. A 30 N push on the lower jack,
+from plugging a monitor into the front, gives ~16 MPa there, repeated at every plug-in.
+Two 12 mm braces between the panel back and the flange underside fix it. They sit in
+the 3.7 mm strips at the panel edges, clear of the jacks' latch travel. The composite
+section takes the same push to ~2.2 MPa, about 7× less, and the braces print as 45°
+fins.
+
+**Brick bay tabs.** The bay hangs from two bolts at z = 20.
+- **Inner tab (8 × 4 mm).** At rest it sees ~6.5 MPa at its root; a 50 N handling load
+  gives ~38 MPa. An 11 mm brace behind it, topping out below the bolt head, moves the
+  weakest section up to the brace top, where the same load gives ~12 MPa.
+- **Outer tab (above the 12 mm lip).** A 50 N load gives ~14 MPa; a 4.5 mm brace takes
+  it to ~6 MPa.
+
+The bay braces sit in the front ~25 mm that is already kept clear for the machines'
+rear plugs.
+
+**Not braced:**
+- the tray wall-to-floor corners inside the bays (~1 mm PC clearance, no room);
+- the tray's front posts (backed by the full-length walls).
+
+Tests: `ks_braces_present` and `bb_braces_present_L` fail before this change and pass
+now. `ks_latch_room` keeps the jacks plus 2.5 mm of latch travel clear; widening the
+braces to 6 mm makes it fail. `bb_driver_clear_L` keeps the M3 heads and the screwdriver
+path along y clear.
 
