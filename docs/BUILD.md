@@ -21,7 +21,7 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 | `rear_stop` | 2 | 64 × 26 × 5 mm |
 | `front_lip` | 2 | 202 × 11 × 3 mm — symmetric, same part both sides |
 | `tie_plate` | 1 | 52 × 30 × 3 mm |
-| `cable_floor` | 1 | 35 × 178 × 3 mm |
+| `cable_floor` | 1 | 35 × 172 × 3 mm |
 
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
