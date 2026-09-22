@@ -28,14 +28,53 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
 
-Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Print everything in the
-orientation it's exported in. **The trays need support under the strip above each PC
-opening**: it spans 184 mm with nothing beneath it. Supports from the build plate are
-enough, and nothing else on the trays needs them. The other parts print without supports.
-Roughly 640 cm³ / 490 g of filament.
+Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Roughly 635 cm³ /
+480 g of filament.
 
 **PETG, ASA or PC-blend — not PLA.** Root bending stress is only 0.73 MPa, so this is
 about creep in a warm rack over months, not about strength.
+
+## Printing
+
+Written for a Bambu Lab H2D in Bambu Studio; the same points apply to other printers.
+
+**Orientation.** The STLs are pre-oriented. Don't auto-orient, and answer *No* when Bambu
+Studio offers to load them as a single object with multiple parts.
+
+**Supports: painted, only where listed.**
+- **Trays:** the strip above each PC opening spans 184 mm with nothing directly beneath
+  it. Paint a support enforcer under that strip only. The support stands on the panel's
+  own lower strip (z 0–3), not the build plate, so *build plate only* generates
+  nothing. Don't switch on global supports: at the default max bridge length (10 mm),
+  the slicer also fills the ear-bolt pockets, bolt slots and inner-wall vents, and
+  support in a 7.4 mm pocket can't be removed. Those are bridges and print fine.
+- **Keystone:** the top flange stands up as a fin in print orientation, and 8.3 mm of it
+  on each side starts 6 mm above the bed with nothing under it. Paint support under
+  those two wings.
+- **Everything else** prints without supports.
+- **Interface:** use the second nozzle with PLA, or Bambu Support for PLA/PETG, as the
+  support interface. PETG support welds to PETG. The tray strip's underside is the top
+  edge of the rack-face opening, so it should come away clean.
+
+**Solid ear-bolt walls.** Add a modifier over each tray's outer wall covering both rows
+of ear-bolt pockets (from the front face back ~150 mm, full height), set to 100 % infill.
+The square nuts bear on the plastic beside the bolt slots; solid is stronger there than
+infill behind a few perimeters.
+
+**Seam: rear** on the trays. The default *aligned* seam picks the sharp corners of the
+rack-face openings.
+
+**Plates:**
+1. Keystone, both front lips, tie plate, cable floor and both rear stops. **Print this
+   first:** in about an hour it shows how the pilots, the keystone apertures and the
+   first-layer flare turned out, before committing to a tray.
+2. Both brick bays together. Printed alone, a bay's last ~20 mm is two 32 mm-tall posts
+   190 mm apart, with layer times too short to cool. Four posts per layer lets
+   slowdown-for-cooling work.
+3. and 4. One tray each. Two trays don't fit on one plate.
+
+**Filament:** dry it. The pocket and slot roofs are bridges, and wet filament sags and
+strings on bridges.
 
 ## Bill of materials
 

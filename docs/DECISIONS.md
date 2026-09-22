@@ -334,6 +334,9 @@ Found by working through every screw (reach, length, engagement), every assembly
   the machines slide in from the front.
 - **Supports.** The strip above each PC opening is a 184 mm unsupported span when
   printed floor-down, so the trays need supports there. "No supports" was wrong.
+  *Correction (#15): that support stands on the panel's own lower strip, not the build
+  plate. It has to be painted under the strip only, and the keystone's flange wings need
+  it too. See BUILD.md → Printing.*
 - **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
   headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
   That corrects D15.
