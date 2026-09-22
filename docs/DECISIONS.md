@@ -27,6 +27,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-22 | Ear bolts: square nut, no washer (D29). |
 | 2026-09-22 | Printability fixes from the H2D review (D30). |
 | 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
+| 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
 
 ---
 
@@ -157,6 +158,9 @@ with mains ends outboard, the pair uses ~372 mm of the width and a 90 mm-deep ba
 lengthwise would have needed ~190 mm of depth. Overall depth ~316 mm. The Lenovo's
 35 mm thickness leaves 6.5 mm of headroom in the U, so straps pass under and around,
 never over. DC leads run forward through the 36 mm centre gap between the two bays.
+*Corrected since: the bay floor is 4 mm, so headroom is ~5.5 mm, and a strap does pass
+over the brick (D24). DC leads only run forward to each machine's own jack; the centre
+gap carries the video leads (D23).*
 
 ### D16 — Thermal risk, accepted and partly de-risked
 Both machines exhaust rearward toward the bricks. Mitigations: ~29 mm plenum, vented
@@ -164,6 +168,8 @@ floor, open rear, and bays that unbolt so the bricks can move to their own U wit
 touching anything else. Later evidence: the closest public design puts two PCs and
 both bricks in 1U with the bricks directly behind, printed in PLA+, and months of
 use by several builders produced no heat or warping complaints. Still worth watching.
+*The plenum is now ~40 mm: the bricks sit behind the 25 mm kept clear for the machines'
+rear plugs.*
 
 Design assumptions: machines that run mostly idle rather than at sustained full
 load, in a rack with its own forced ventilation and an interior at or below about
@@ -335,6 +341,10 @@ Found by working through every screw (reach, length, engagement), every assembly
   the machines slide in from the front.
 - **Supports.** The strip above each PC opening is a 184 mm unsupported span when
   printed floor-down, so the trays need supports there. "No supports" was wrong.
+  *Since then (D31, 2026-09-22): slicer settings, including how to support, are left to
+  the 3MF built from this geometry. BUILD.md only says which features need support, and
+  `tests/run.sh` checks that list. "Supports from the build plate are enough" was wrong:
+  the support stands on the panel's own lower strip.*
 - **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
   headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
   That corrects D15.

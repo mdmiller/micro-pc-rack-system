@@ -4,9 +4,10 @@
 shelf holding two machines side by side, front-loading, with keystone jacks for
 console video at the front and a bolt-on bay for the power bricks at the rear.
 
-![Assembled v3](docs/preview.png)
+![Assembled shelf](docs/preview.png)
 
-**Status:** v3 designed and verified in CAD. Nothing printed yet.
+**Status:** v3.1 plus the review fixes logged in [DECISIONS.md](docs/DECISIONS.md) (D21–D31),
+verified in CAD. Nothing printed yet.
 
 ## What it has to do
 
@@ -34,7 +35,7 @@ stl/                     binary STLs, pre-oriented for printing; regenerate with
 build.sh                 renders every part from the source
 tests/run.sh             interference, clearance and alignment checks
 tools/canon_stl.py       makes STL output stable, so git diffs mean real changes
-docs/BUILD.md            print settings, bill of materials, assembly
+docs/BUILD.md            parts, bill of materials, assembly, servicing
 docs/DECISIONS.md        why the design is the way it is
 docs/prior-art.md        survey of public designs and what was learned from them
 ```
@@ -71,12 +72,16 @@ where relevant.
 
 ## Open items
 
-- [ ] Caliper-check the steel bracket's 23.8 mm hole-row spacing before printing both
-      trays. If it differs, change `brk_row_dz`.
+- [ ] Caliper-check the steel bracket before printing both trays: the 23.8 mm hole-row
+      spacing (`brk_row_dz`), and the bend-to-first-hole distance, which was never on the
+      drawing (`ear_c0` assumes ~15 mm; the ±8 mm slots absorb small errors).
 - [ ] Print one tray first and test-fit both machines.
 - [ ] Watch temperatures for the first few weeks — see the thermal note in
       DECISIONS.md.
-- [ ] Choose a keystone coupler type (DP or HDMI) per machine.
+- [ ] Choose a keystone coupler per machine: slim-head HDMI or mini-DP (standard-head
+      plugs don't fit; see BUILD.md and D26).
+- [ ] Measure each machine's rubber-foot positions, so the floor vents can leave solid
+      runners under them (#15).
 - [ ] Get the MS-01 power adapter dimensions, then design the 2U shelf.
 
 ## Licence

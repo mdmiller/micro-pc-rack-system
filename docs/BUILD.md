@@ -1,4 +1,4 @@
-# Modular 19" Micro-PC Rack System — v3
+# Modular 19" Micro-PC Rack System — build guide
 
 A 1U shelf for two 1-litre micro PCs, front-loading, with a stacked keystone bay for
 video pass-through and a bolt-on rear bay for the power bricks. Mounts on **steel rack
@@ -28,11 +28,10 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
 
-Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Print everything in the
-orientation it's exported in. **The trays need support under the strip above each PC
-opening**: it spans 184 mm with nothing beneath it. Supports from the build plate are
-enough, and nothing else on the trays needs them. The other parts print without supports.
-Roughly 640 cm³ / 490 g of filament.
+Largest part is 209 × 206 mm, so a 220 mm bed works with margin. The STLs are exported
+in print orientation. In that orientation two features need support: the strip above
+each tray's PC opening, and the keystone flange's two wings. Everything else prints
+without (`tests/run.sh` checks this; D31). Roughly 635 cm³ / 480 g of filament.
 
 **PETG, ASA or PC-blend — not PLA.** Root bending stress is only 0.73 MPa, so this is
 about creep in a warm rack over months, not about strength.
@@ -148,6 +147,7 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `bb_brace`, `bb_brace_o` | 11, 4.5 | brick bay inner and outer tab braces; the inner one must stay below the M3 head at z 20 |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
+| `nut_s`, `nut_clr`, `skin_t` | 7.0, 0.4, 7.3 | square nut size, its pocket clearance (the nut's 9.9 mm diagonal must not fit), and the solid skin the bolt passes through |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
@@ -158,14 +158,16 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 
 ## Known limitations
 
-- **Thermal:** both machines exhaust rearward toward the brick bay. There's a ~29 mm
-  plenum, an open vent grid under the bricks and an open rear, but two adapters sitting in
+- **Thermal:** both machines exhaust rearward toward the brick bay. There's a ~40 mm gap
+  behind each machine (17 mm to the tray's rear edge plus the 25 mm kept clear at the
+  front of the bay), an open vent grid under the bricks and an open rear, but two adapters sitting in
   a 1U exhaust stream is not a configuration I can promise runs cool. If it does run hot,
   the brick bays unbolt and move to their own U without touching anything else.
 - The Lenovo brick is 35 mm thick and sits on a 4 mm bay floor, leaving about 5.5 mm of
   headroom in the U: room for a velcro strap over the top, nothing more.
 - Verified against the bracket drawing, not against a bracket in hand. Check the 23.8 mm
-  row spacing with calipers before printing both trays; it's a one-parameter fix.
+  row spacing (`brk_row_dz`) and the bend-to-first-hole distance (`ear_c0`) with calipers
+  before printing both trays; each is a one-parameter fix.
 - Front-rail mounting only. The numbers say that's fine — 0.4 mm of creep deflection over
   a warm year — but an asymmetrically loaded shelf will still twist slightly, which is
   what the tie plate is there to resist.
