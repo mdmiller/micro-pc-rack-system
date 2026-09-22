@@ -24,6 +24,10 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
 | 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
 | 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
+| 2026-09-22 | Ear bolts: square nut, no washer (D29). |
+| 2026-09-22 | Printability fixes from the H2D review (D30). |
+| 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
+| 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
 
 ---
 
@@ -103,6 +107,7 @@ a socket head fouls the rail); body 442 mm, leaving 2.5 mm per side in a 450 mm
 opening. **Correction (D28):** that counted the steel but not the bolt heads. Verified: an M4 hex nut seats in the channel and the bolt clears.
 **Superseded by D22:** the nuts could never be loaded into the channels.
 
+
 ### D10 — Centre tie at front and rear
 Keystone module (front) and tie plate (rear) both bolt across the two inner walls.
 Field evidence later confirmed this matters: users of the closest public design found
@@ -153,6 +158,9 @@ with mains ends outboard, the pair uses ~372 mm of the width and a 90 mm-deep ba
 lengthwise would have needed ~190 mm of depth. Overall depth ~316 mm. The Lenovo's
 35 mm thickness leaves 6.5 mm of headroom in the U, so straps pass under and around,
 never over. DC leads run forward through the 36 mm centre gap between the two bays.
+*Corrected since: the bay floor is 4 mm, so headroom is ~5.5 mm, and a strap does pass
+over the brick (D24). DC leads only run forward to each machine's own jack; the centre
+gap carries the video leads (D23).*
 
 ### D16 — Thermal risk, accepted and partly de-risked
 Both machines exhaust rearward toward the bricks. Mitigations: ~29 mm plenum, vented
@@ -160,6 +168,8 @@ floor, open rear, and bays that unbolt so the bricks can move to their own U wit
 touching anything else. Later evidence: the closest public design puts two PCs and
 both bricks in 1U with the bricks directly behind, printed in PLA+, and months of
 use by several builders produced no heat or warping complaints. Still worth watching.
+*The plenum is now ~40 mm: the bricks sit behind the 25 mm kept clear for the machines'
+rear plugs.*
 
 Design assumptions: machines that run mostly idle rather than at sustained full
 load, in a rack with its own forced ventilation and an interior at or below about
@@ -246,6 +256,7 @@ and a part that falls apart into two bodies doesn't collide with anything. New t
 v3.1 and passes now.
 
 ### D22 — Ear nut channels couldn't be loaded; replaced with per-bolt pockets (2026-09-21)
+*Washer and hex nut replaced by a square nut in D29.*
 D9's channels were sealed at both ends. They run y 8–165 inside a wall that runs
 6–206, so the "slide the nuts in from the rear" step had 41 mm of solid wall in the way.
 The only opening was the 4.8 mm bolt slot on the outside face. A 7 mm nut passes that
@@ -330,6 +341,10 @@ Found by working through every screw (reach, length, engagement), every assembly
   the machines slide in from the front.
 - **Supports.** The strip above each PC opening is a 184 mm unsupported span when
   printed floor-down, so the trays need supports there. "No supports" was wrong.
+  *Since then (D31, 2026-09-22): slicer settings, including how to support, are left to
+  the 3MF built from this geometry. BUILD.md only says which features need support, and
+  `tests/run.sh` checks that list. "Supports from the build plate are enough" was wrong:
+  the support stands on the panel's own lower strip.*
 - **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
   headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
   That corrects D15.
@@ -446,4 +461,113 @@ floor: at 32 the braces cut into the latch clearance.
 `rack_open` and `rack_margin` now live in the source. The new test
 `rack_width_margin` models the heads at every bolt and fails if they come within
 2 mm of the rails; it fails at 36 (461 mm³ outside the margin) and passes at 33.
+
+### D29 — Ear bolts: square nut, no washer (2026-09-22, issue #15)
+D22's pocket was sized for a 9 mm washer, which made it taller than the hex nut's
+8.1 mm corners. That caused two problems:
+- The nut spun freely. The only way to hold it was a fingertip; a spanner can't get
+  around a nut inside a 9.3 mm pocket.
+- The pocket had 0.3 mm of clearance over the washer. Layer quantisation and roof sag
+  (#15) could close that up, so the washer might not go in at all.
+
+A square nut in the same washer pocket doesn't fully fix it. Its 9.9 mm diagonal lets
+it turn 23–37° before jamming corner-first into printed plastic, depending on the
+printed pocket height. And the window between "washer won't fit" and "nut spins
+freely" is only ~0.7 mm.
+
+Chosen: **square M4 nut (DIN 557), no washer, pocket sized to the nut** (7.4 mm tall,
+`nut_clr` 0.4). In that pocket the nut can turn about 2.5° before it locks, and it
+still slides fore-aft with the ±8 mm travel.
+
+**What dropping the washer costs.** Once the 4.5 mm slot band is taken out, the nut's
+face bears on less plastic:
+
+| Nut bearing on plastic | Area | Stress at ~0.5 N·m |
+|---|---|---|
+| washer (D22) | ~25 mm² | — |
+| **square nut** | **~17.5 mm²** | ~36 MPa |
+| hex nut | ~11.9 mm² | ~52 MPa |
+
+Among the no-washer options the square nut is clearly better: the hex nut is already
+around PETG's crush strength at snug. Dropping the washer also frees 0.8 mm, so the
+solid skin goes from 6.5 to 7.3 mm, which helps pull-through and the slot edges' bearing
+against the bolt. M4 × 12 still lands flush with the nut face, 0.5 mm short of the bay.
+
+**Assembly note.** BUILD.md now says "snug, not hard". The joint's load is the bolt
+shanks bearing on the slot edges, not clamp force.
+
+Test: `m4_nut_cannot_spin` requires the nut's full turning circle to hit wall at every
+seat. It gets 427 mm³ here. With the washer-height pocket it's 50 mm³, so that pocket
+would let the nut turn. The seated, insertable and past-travel checks now use the
+square nut. D22 marked partly superseded.
+
+### D30 — Printability fixes from the H2D review (2026-09-22, issue #15)
+Model changes from #15 that don't depend on a test print:
+
+- **Cable-floor ledges 6 → 8 mm.** The M3 pilot, centred in a 6 mm ledge, left
+  1.65 mm of plastic on the inboard side, likely to split as the screw self-taps. Now
+  2.65 mm each side. The void between the ledges drops to 17 mm, so the zip-tie slot
+  pairs move from ±8 to ±6 mm about the centre; `ziptie_void` still passes.
+- **Plenum and velcro slots no longer touch.** The plenum slot (y 2–10) and the front
+  velcro slots (then y 10–26) met at y = 10, the same "two voids touching" defect as
+  D19. That left the bay's front edge as two thin ribs, and it's the edge that bears
+  on the tray. The front velcro row moves to y = 20.5, leaving 2.5 mm of rib to the
+  plenum and 2.5 mm to the vent grid.
+- **Velcro strap path recessed.** The zip-tie anchors got underside grooves in D23;
+  the velcro slots didn't, so a strap under the floor stood ~1.5–2 mm below the shelf
+  into the inter-U gap. Each slot pair is now joined by a 16 × 2 mm underside groove.
+  Printed floor-down, that's a 16 mm bridge.
+- **Keystone panel chamfer and clearance.** The panel prints face-down, and first-layer
+  flare (0.1–0.25 mm per side) ate most of the 0.3 mm side clearance and narrowed the
+  aperture fronts where the couplers enter. A 0.5 mm 45° chamfer round the face-down
+  perimeter and both apertures (`ks_chamfer`) removes the flare, and `ks_clr` goes
+  0.3 → 0.5. The braces (D27) move in with the panel edge and still clear the latch
+  zone.
+
+**Waiting on data:**
+- **Horizontal pilot size (2.7 → 2.9 or teardrop):** waits for a test print.
+- **Solid runners in the floor vents under the machines' feet:** waits for the actual
+  foot positions.
+
+New tests: `bb_plenum_velcro_rib`, `velcro_groove_clear` and `ks_face_chamfered` all
+fail on the previous geometry and pass now.
+
+### D31 — Test for unsupported overhangs in print orientation (2026-09-22, issue #15)
+#15's point 8: every check in `tests/run.sh` was solid-against-solid in the
+assembly, so nothing could see how a part prints. That's how the keystone flange
+wings, which start 6 mm above the bed with nothing under them, reached `main`. It's
+also how v3's floating brick-bay tab (D21) got through until someone counted shells.
+
+**The check.** Each part is taken in its exported orientation. A new `printed(p)`
+module holds the export transforms, shared by `build.sh` and the tests; the refactor
+leaves every STL byte-identical. The part is sliced every 0.4 mm, and material not
+within 45° of the slice below counts as unsupported. An opening of 1.3 mm removes
+slivers narrower than 2.6 mm: these are the caps of M3/M4 horizontal holes and
+countersinks, which bridge trivially. What remains must fall inside that part's
+**allow-list**:
+
+| Part | Allowed | Why |
+|---|---|---|
+| trays | strip above each PC opening | **needs support** |
+| trays | ear-bolt pocket and slot roofs, inner-wall vent roofs | bridges ≤ 30 mm |
+| keystone | the two flange wings | **needs support** |
+| brick bay | velcro and zip-tie groove roofs under the floor | bridges ≤ 16 mm |
+| all others | nothing | |
+
+So a new overhang fails unless someone decides it's a bridge or that it needs support,
+and adds it to the list. The allow-list boxes are derived from the same parameters as the features,
+so they move with the geometry.
+
+**Controls.**
+- `ov_control_wings` runs the keystone with no allow-list and must catch the wings
+  (227 mm³).
+- Restoring v3.1's floating tab in a scratch copy makes `ov_brick_bay` fail at exactly
+  the tab (x 195–203, z 8).
+
+**Scope.** This is a geometry check: which features bridge and which need support.
+How to support them is a slicer decision and lives in the 3MF, not the repo.
+
+**Limits.** It judges geometry, not a slicer. The 45° rule and the 2.6 mm sliver
+filter are approximations; bridge quality, sag and first-layer flare aren't modelled.
+Adds ~2 s to the suite.
 

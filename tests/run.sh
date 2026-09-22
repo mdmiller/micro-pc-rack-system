@@ -10,14 +10,17 @@ tray_stop_L:zero tray_stop_R:zero trays_tie:zero tray_bricks_L:zero tray_bricks_
 tray_device_L:zero tray_device_R:zero tray_tray:zero keystone_tie:zero
 pullout_L:zero pullout_R:zero lip_blocks_L:block lip_blocks_R:block
 lip_holes_L:zero lip_holes_R:zero pilot_vs_pocket:zero lip_clear_of_face:zero
-m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block
+m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block m4_nut_cannot_spin:block
 bb_tab_rooted_L:block
 tray_cf:zero keystone_cf:zero tie_cf:zero bricks_cf:zero cf_holes:zero ziptie_void:zero
 rear_face_open_L:zero stop_meets_face_L:block
 stop_screws_L:zero stop_screws_R:zero keystone_side_clear:zero
 plug_vs_keystone:zero plug_vs_cf:zero plug_vs_plug:zero flange_over_relief:block
 ks_braces_present:block bb_braces_present_L:block ks_latch_room:zero bb_driver_clear_L:zero
-rack_width_margin:zero"
+rack_width_margin:zero
+bb_plenum_velcro_rib:block velcro_groove_clear:zero ks_face_chamfered:zero
+ov_tray_left:zero ov_tray_right:zero ov_keystone:zero ov_brick_bay:zero ov_front_lip:zero
+ov_rear_stop:zero ov_tie_plate:zero ov_cable_floor:zero ov_control_wings:block"
 fail=0
 for t in $TESTS; do
   name=${t%%:*}; kind=${t##*:}

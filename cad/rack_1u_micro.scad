@@ -46,8 +46,10 @@ flange_t = 3;
 flange_l = 30;
 
 /* [M4 ear bolts] */
-wsh_d    = 9.0;   // M4 washer (DIN 125); the pocket is sized to it
-skin_t   = 6.5;   // solid outer skin the bolt passes through
+nut_s    = 7.0;   // M4 square nut (DIN 557) across flats; the pocket is sized to it
+nut_m    = 3.2;   // nut thickness
+nut_clr  = 0.4;   // pocket clearance over nut_s; the diagonal (9.9) can't turn in it
+skin_t   = 7.3;   // solid outer skin the bolt passes through
 bolt_slot = 4.5;  // M4 clearance slot height
 ear_c0   = 22;    // first bracket hole column at mid-travel, from the rack face
 ear_travel = 16;  // fore-aft adjustment of the shelf against the bracket
@@ -57,7 +59,8 @@ ks_w  = 19.3;     // aperture, rotated 90 deg (stacked pair)
 ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
-ks_clr = 0.3;     // side clearance of the keystone panel in the gap between trays
+ks_clr = 0.5;     // side clearance of the keystone panel in the gap between trays
+ks_chamfer = 0.5; // 45-deg chamfer on the face-down edges: eats elephant's foot (D30)
 ks_relief_d = 1.0;  // relief in the flange underside over the upper rear video plug,
 ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
 
@@ -75,7 +78,8 @@ stop_h = 8;       // top of the stop face above the tray floor; the stop touches
 cf_y0   = 50;     // starts behind the lower rear video plug's head (slim HDMI, D26)
 cf_ext  = 16;     // overhang past the tray rear, into the gap between brick bays
 cf_t    = 3;
-ledge_w = 6;      // ledge on each inner wall that carries the cable floor
+ledge_w = 8;      // ledge on each inner wall that carries the cable floor (2.65 mm
+                  // of plastic either side of its M3 pilot, D30)
 ledge_h = 4;      // also the zip-tie clearance under the floor
 
 /* [Brick bay] */
@@ -132,18 +136,18 @@ module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(
 // =====================================================================
 //  TRAY
 // =====================================================================
-// One pocket per bracket hole, open to the bay: washer and nut go in from
+// One pocket per bracket hole, open to the bay: a square nut slides in from
 // inside before the PC does, the bolt comes in from outside through the slot.
-// Every roof is a short bridge. The washer spreads the clamp load off the
-// thin strips of skin either side of the slot.
-ear_y_min = ear_c0 - ear_travel/2 - wsh_d/2 - 0.3;   // front edge of the front pockets
+// The pocket is nut-height, so the nut's 9.9 mm diagonal can't turn in it; it
+// only slides fore-aft with the travel. Every roof is a short bridge. (D29)
+ear_y_min = ear_c0 - ear_travel/2 - (nut_s+nut_clr)/2;   // front edge of the front pockets
 module ear_pockets() {
   for (z = brk_z, c = [0,1]) {
     y0 = ear_c0 + c*brk_col_dy - ear_travel/2;
     translate([-1, y0-bolt_slot/2, z-bolt_slot/2])
       cube([skin_t+1+eps, ear_travel+bolt_slot, bolt_slot]);            // bolt slot
-    translate([skin_t, y0-wsh_d/2-0.3, z-(wsh_d+0.3)/2])
-      cube([wall_o-skin_t+1, ear_travel+wsh_d+0.6, wsh_d+0.3]);         // washer + nut
+    translate([skin_t, y0-(nut_s+nut_clr)/2, z-(nut_s+nut_clr)/2])
+      cube([wall_o-skin_t+1, ear_travel+nut_s+nut_clr, nut_s+nut_clr]); // square nut
   }
 }
 
@@ -203,6 +207,16 @@ module tray_right() { translate([body_w,0,0]) mirror([1,0,0]) tray_left(); }
 // =====================================================================
 ks_z = [panel_h/2 - (ks_h+ks_gap)/2, panel_h/2 + (ks_h+ks_gap)/2];
 
+// The panel prints face-down; a 45-degree chamfer round its front perimeter
+// removes the first-layer flare that would eat the 0.5 mm side clearance.
+module ks_face_chamfer() {
+  x0 = seam_l+ks_clr;  w = key_w-2*ks_clr;  c = ks_chamfer;
+  difference() {
+    translate([x0-1, -1, -1]) cube([w+2, 1+c, panel_h+2]);
+    hull() { translate([x0+c, 0, c]) cube([w-2*c, eps, panel_h-2*c]);
+             translate([x0, c-eps, 0]) cube([w, eps, panel_h]); }
+  }
+}
 module keystone() {
   difference() {
     union() {
@@ -215,8 +229,13 @@ module keystone() {
     }
     translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi-eps])    // plug relief, clear of
       cube([ks_relief_w, flange_l-ks_wall+eps, ks_relief_d+eps]);      // the panel joint at y=6
+    ks_face_chamfer();
     for (z = ks_z) {
       yprism(body_w/2, z, panel_t+2*eps) square([ks_w, ks_h], center=true);
+      hull() {                                                        // aperture front chamfer
+        translate([body_w/2, -eps, z]) rotate([-90,0,0]) linear_extrude(eps) square([ks_w+2*ks_chamfer, ks_h+2*ks_chamfer], center=true);
+        translate([body_w/2, ks_chamfer, z]) rotate([-90,0,0]) linear_extrude(eps) square([ks_w, ks_h], center=true);
+      }
       translate([body_w/2, ks_wall, z]) rotate([-90,0,0])
         linear_extrude(panel_t) square([ks_w+2, ks_h+2], center=true);
     }
@@ -279,7 +298,7 @@ module cable_floor() {
     cube([cf_w, cf_len, cf_t]);
     for (x=[ledge_w/2-0.3, cf_w-ledge_w/2+0.3], y=cf_scr_y)
       translate([x, y-cf_y0, -eps]) cylinder(d=d_free, h=cf_t+2*eps);
-    for (y=[20:30:cf_len-10], dx=[-8,8])                     // zip-tie slot pairs
+    for (y=[20:30:cf_len-10], dx=[-6,6])                     // zip-tie slot pairs
       translate([cf_w/2+dx, y, -eps]) linear_extrude(cf_t+2*eps) square([2.2,5],center=true);
   }
 }
@@ -302,8 +321,10 @@ module brick_bay() {
         polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
-    for (x=[30,70,110,150], y=[18, 93])                      // velcro strap slots
-      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2);
+    for (x=[30,70,110,150], y=[20.5, 93])                    // velcro strap slots, 2.5 mm
+      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2); // clear of the plenum slot
+    for (x0=[30,110], y=[20.5, 93])                          // strap recessed under the
+      translate([x0, y-8, -eps]) cube([40, 16, 2+eps]);      // floor between each slot pair
     for (i=[0:2], j=[0:1])                                   // vent grid
       translate([wall_o+26+i*52, 42+j*30, -eps])
         linear_extrude(floor_t+2) rr(40,22,4);
@@ -343,13 +364,18 @@ module assembly() {
 }
 
 // ---------------------- render ----------------------
-if      (part=="none")       { }                 // used by tests/run.sh
-else if (part=="tray_left")  tray_left();
-else if (part=="tray_right") tray_right();
-else if (part=="keystone")   translate([-seam_l+wall_i, panel_h, 0]) rotate([90,0,0]) keystone();
-else if (part=="front_lip")  translate([0, lip_tab_h, 0]) rotate([90,0,0]) front_lip();  // flat, show face down
-else if (part=="rear_stop")  rear_stop();
-else if (part=="tie_plate")  tie_plate();
-else if (part=="cable_floor") cable_floor();
-else if (part=="brick_bay")  brick_bay();
-else                         assembly();
+// Each part in its print orientation. build.sh exports these; tests/run.sh
+// checks them for unsupported overhangs (D31).
+module printed(p) {
+  if      (p=="tray_left")   tray_left();
+  else if (p=="tray_right")  tray_right();
+  else if (p=="keystone")    translate([-seam_l+wall_i, panel_h, 0]) rotate([90,0,0]) keystone();
+  else if (p=="front_lip")   translate([0, lip_tab_h, 0]) rotate([90,0,0]) front_lip();  // face down
+  else if (p=="rear_stop")   rear_stop();
+  else if (p=="tie_plate")   tie_plate();
+  else if (p=="cable_floor") cable_floor();
+  else if (p=="brick_bay")   brick_bay();
+}
+if      (part=="none")     { }                 // used by tests/run.sh
+else if (part=="assembly") assembly();
+else                       printed(part);

@@ -1,4 +1,4 @@
-# Modular 19" Micro-PC Rack System — v3
+# Modular 19" Micro-PC Rack System — build guide
 
 A 1U shelf for two 1-litre micro PCs, front-loading, with a stacked keystone bay for
 video pass-through and a bolt-on rear bay for the power bricks. Mounts on **steel rack
@@ -28,11 +28,10 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 One rear stop fits every machine. It's a low curb that touches only the bottom 8 mm of
 the rear face, so it doesn't care about case height or where the ports are.
 
-Largest part is 209 × 206 mm, so a 220 mm bed works with margin. Print everything in the
-orientation it's exported in. **The trays need support under the strip above each PC
-opening**: it spans 184 mm with nothing beneath it. Supports from the build plate are
-enough, and nothing else on the trays needs them. The other parts print without supports.
-Roughly 640 cm³ / 490 g of filament.
+Largest part is 209 × 206 mm, so a 220 mm bed works with margin. The STLs are exported
+in print orientation. In that orientation two features need support: the strip above
+each tray's PC opening, and the keystone flange's two wings. Everything else prints
+without (`tests/run.sh` checks this; D31). Roughly 635 cm³ / 480 g of filament.
 
 **PETG, ASA or PC-blend — not PLA.** Root bending stress is only 0.73 MPa, so this is
 about creep in a warm rack over months, not about strength.
@@ -42,8 +41,7 @@ about creep in a warm rack over months, not about strength.
 **Rack mounting**
 - 2 × steel 1U rack ear brackets (Penn-Elcom R1206/1U or equivalent, ~$5.50 each)
 - 8 × M4 × 12 button head — anything taller than a button head fouls the rail
-- 8 × M4 hex nuts (7.0 mm across flats, 3.2 thick — standard DIN 934)
-- 8 × M4 washers (9 mm OD, 0.8 thick — standard DIN 125)
+- 8 × M4 **square** nuts (7.0 mm across flats, 3.2 thick — standard DIN 557). No washers.
 - 4 × rack screws + cage nuts for the brackets themselves
 
 **Assembly**
@@ -74,14 +72,18 @@ about creep in a warm rack over months, not about strength.
 
 Each outer wall has four pockets, one per bracket hole, at z = 9.7 and 33.5 mm to match
 the bracket's two hole rows (9.4 mm up from the bracket's bottom edge, 23.8 mm apart) and
-110 mm apart front to back. Each pocket opens into the bay: drop a washer and nut in from
+110 mm apart front to back. Each pocket opens into the bay: slide a square nut in from
 inside, then bolt through the bracket's Ø4.8 hole from outside. An M4 × 12 lands flush
 with the nut face and stops 0.5 mm short of the bay.
 
 The bolt passes through a slot rather than a hole, giving ±8 mm of fore-aft travel. The
 bracket's hole column position doesn't need to be exact, and you can slide the shelf to
-set how far it sits proud of the rack face. The pocket is sized for the washer, so the
-nut can turn: hold it with a finger or a 7 mm spanner while you tighten.
+set how far it sits proud of the rack face. The pocket is only 0.4 mm taller than the
+nut, so the nut slides along the slot but can't turn: no tool needed on the inside.
+
+Tighten **snug, not hard.** The nut bears on the strips of plastic either side of the
+slot, and those crush long before an M4 is at full torque. The joint doesn't need clamp
+force: the shelf's weight is carried by the bolt shanks bearing on the slot edges.
 
 ## Assembly
 
@@ -92,7 +94,7 @@ the U above blocks access from the top.
 1. Fit the keystone couplers first. Lay the keystone module face-down on a flat surface
    and press the couplers in until they click. Once installed, the panel hangs from its
    top edge only, so don't push couplers into it afterwards.
-2. Drop a washer then a nut into each of the four pockets in each tray's outer wall, from
+2. Slide a square nut into each of the four pockets in each tray's outer wall, from
    inside the bay, and bolt the steel ears on loosely.
 3. Drop the keystone module between the two tray fronts; screw its top flange into both
    inner walls. Fit the tie plate at the rear the same way.
@@ -100,8 +102,7 @@ the U above blocks access from the top.
    it down (6 screws, all reachable from above).
 5. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
 6. Set the depth: slide the shelf along the bracket slots until its front sits where you
-   want it relative to the ear legs, then tighten all eight M4s, holding each nut from
-   inside the bay.
+   want it relative to the ear legs, then tighten all eight M4s snug.
 7. Set the rear stops: slide each machine in from the front, push its rear stop forward
    against the bottom of the rear face, tighten, then slide the machine back out.
 8. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
@@ -146,22 +147,27 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `bb_brace`, `bb_brace_o` | 11, 4.5 | brick bay inner and outer tab braces; the inner one must stay below the M3 head at z 20 |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
+| `nut_s`, `nut_clr`, `skin_t` | 7.0, 0.4, 7.3 | square nut size, its pocket clearance (the nut's 9.9 mm diagonal must not fit), and the solid skin the bolt passes through |
 | `ear_c0`, `ear_travel` | 22, 16 | first bracket hole column at mid-travel, and the fore-aft travel of the slots |
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
 | `key_w` | 33 | keystone column width; 33 is the narrowest the braced jacks allow (D28) |
+| `ks_clr`, `ks_chamfer` | 0.5, 0.5 | keystone panel side clearance, and the chamfer on its face-down edges and apertures |
+| `ledge_w` | 8 | cable-floor ledges; below ~8 the M3 pilot's inboard wall gets thin enough to split |
 | `rack_open`, `rack_margin` | 450.85, 2.0 | measured rail opening and the clearance `tests/run.sh` enforces across the ear-bolt heads |
 
 ## Known limitations
 
-- **Thermal:** both machines exhaust rearward toward the brick bay. There's a ~29 mm
-  plenum, an open vent grid under the bricks and an open rear, but two adapters sitting in
+- **Thermal:** both machines exhaust rearward toward the brick bay. There's a ~40 mm gap
+  behind each machine (17 mm to the tray's rear edge plus the 25 mm kept clear at the
+  front of the bay), an open vent grid under the bricks and an open rear, but two adapters sitting in
   a 1U exhaust stream is not a configuration I can promise runs cool. If it does run hot,
   the brick bays unbolt and move to their own U without touching anything else.
 - The Lenovo brick is 35 mm thick and sits on a 4 mm bay floor, leaving about 5.5 mm of
   headroom in the U: room for a velcro strap over the top, nothing more.
 - Verified against the bracket drawing, not against a bracket in hand. Check the 23.8 mm
-  row spacing with calipers before printing both trays; it's a one-parameter fix.
+  row spacing (`brk_row_dz`) and the bend-to-first-hole distance (`ear_c0`) with calipers
+  before printing both trays; each is a one-parameter fix.
 - Front-rail mounting only. The numbers say that's fine — 0.4 mm of creep deflection over
   a warm year — but an asymmetrically loaded shelf will still twist slightly, which is
   what the tie plate is there to resist.
