@@ -152,6 +152,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `bb_depth` | 90 | brick bay depth |
 | `ks_gap` | 4 | vertical gap between the stacked keystone apertures |
 | `key_w` | 33 | keystone column width; 33 is the narrowest the braced jacks allow (D28) |
+| `ks_clr`, `ks_chamfer` | 0.5, 0.5 | keystone panel side clearance, and the chamfer on its face-down edges and apertures |
+| `ledge_w` | 8 | cable-floor ledges; below ~8 the M3 pilot's inboard wall gets thin enough to split |
 | `rack_open`, `rack_margin` | 450.85, 2.0 | measured rail opening and the clearance `tests/run.sh` enforces across the ear-bolt heads |
 
 ## Known limitations

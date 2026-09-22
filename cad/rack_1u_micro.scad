@@ -59,7 +59,8 @@ ks_w  = 19.3;     // aperture, rotated 90 deg (stacked pair)
 ks_h  = 14.8;
 ks_gap = 4;
 ks_wall = 2.8;
-ks_clr = 0.3;     // side clearance of the keystone panel in the gap between trays
+ks_clr = 0.5;     // side clearance of the keystone panel in the gap between trays
+ks_chamfer = 0.5; // 45-deg chamfer on the face-down edges: eats elephant's foot (D30)
 ks_relief_d = 1.0;  // relief in the flange underside over the upper rear video plug,
 ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
 
@@ -77,7 +78,8 @@ stop_h = 8;       // top of the stop face above the tray floor; the stop touches
 cf_y0   = 50;     // starts behind the lower rear video plug's head (slim HDMI, D26)
 cf_ext  = 16;     // overhang past the tray rear, into the gap between brick bays
 cf_t    = 3;
-ledge_w = 6;      // ledge on each inner wall that carries the cable floor
+ledge_w = 8;      // ledge on each inner wall that carries the cable floor (2.65 mm
+                  // of plastic either side of its M3 pilot, D30)
 ledge_h = 4;      // also the zip-tie clearance under the floor
 
 /* [Brick bay] */
@@ -205,6 +207,16 @@ module tray_right() { translate([body_w,0,0]) mirror([1,0,0]) tray_left(); }
 // =====================================================================
 ks_z = [panel_h/2 - (ks_h+ks_gap)/2, panel_h/2 + (ks_h+ks_gap)/2];
 
+// The panel prints face-down; a 45-degree chamfer round its front perimeter
+// removes the first-layer flare that would eat the 0.5 mm side clearance.
+module ks_face_chamfer() {
+  x0 = seam_l+ks_clr;  w = key_w-2*ks_clr;  c = ks_chamfer;
+  difference() {
+    translate([x0-1, -1, -1]) cube([w+2, 1+c, panel_h+2]);
+    hull() { translate([x0+c, 0, c]) cube([w-2*c, eps, panel_h-2*c]);
+             translate([x0, c-eps, 0]) cube([w, eps, panel_h]); }
+  }
+}
 module keystone() {
   difference() {
     union() {
@@ -217,8 +229,13 @@ module keystone() {
     }
     translate([body_w/2-ks_relief_w/2, ks_wall+panel_t, wall_hi-eps])    // plug relief, clear of
       cube([ks_relief_w, flange_l-ks_wall+eps, ks_relief_d+eps]);      // the panel joint at y=6
+    ks_face_chamfer();
     for (z = ks_z) {
       yprism(body_w/2, z, panel_t+2*eps) square([ks_w, ks_h], center=true);
+      hull() {                                                        // aperture front chamfer
+        translate([body_w/2, -eps, z]) rotate([-90,0,0]) linear_extrude(eps) square([ks_w+2*ks_chamfer, ks_h+2*ks_chamfer], center=true);
+        translate([body_w/2, ks_chamfer, z]) rotate([-90,0,0]) linear_extrude(eps) square([ks_w, ks_h], center=true);
+      }
       translate([body_w/2, ks_wall, z]) rotate([-90,0,0])
         linear_extrude(panel_t) square([ks_w+2, ks_h+2], center=true);
     }
@@ -281,7 +298,7 @@ module cable_floor() {
     cube([cf_w, cf_len, cf_t]);
     for (x=[ledge_w/2-0.3, cf_w-ledge_w/2+0.3], y=cf_scr_y)
       translate([x, y-cf_y0, -eps]) cylinder(d=d_free, h=cf_t+2*eps);
-    for (y=[20:30:cf_len-10], dx=[-8,8])                     // zip-tie slot pairs
+    for (y=[20:30:cf_len-10], dx=[-6,6])                     // zip-tie slot pairs
       translate([cf_w/2+dx, y, -eps]) linear_extrude(cf_t+2*eps) square([2.2,5],center=true);
   }
 }
@@ -304,8 +321,10 @@ module brick_bay() {
         polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
-    for (x=[30,70,110,150], y=[18, 93])                      // velcro strap slots
-      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2);
+    for (x=[30,70,110,150], y=[20.5, 93])                    // velcro strap slots, 2.5 mm
+      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2); // clear of the plenum slot
+    for (x0=[30,110], y=[20.5, 93])                          // strap recessed under the
+      translate([x0, y-8, -eps]) cube([40, 16, 2+eps]);      // floor between each slot pair
     for (i=[0:2], j=[0:1])                                   // vent grid
       translate([wall_o+26+i*52, 42+j*30, -eps])
         linear_extrude(floor_t+2) rr(40,22,4);

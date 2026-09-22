@@ -120,4 +120,15 @@ module earHeads(){ for (s=[0,1], z=brk_z, c=[0,1])
 module outsideEnvelope(){ half=rack_open/2-rack_margin;
   translate([body_w/2-half-50,-10,-10]) cube([50,260,70]); translate([body_w/2+half,-10,-10]) cube([50,260,70]); }
 if (test=="rack_width_margin") intersection(){ union(){ tray_left(); tray_right(); earHeads(); } outsideEnvelope(); }
+// #15 fixes (D30)
+// plastic between the plenum slot and the front velcro slots must be solid
+if (test=="bb_plenum_velcro_rib") intersection(){ bbL(); for (x=[30,70,110,150])
+  translate([x-2.5, tray_d+10, 0]) cube([5, 2.5, floor_t+1]); }
+// the velcro strap path under the floor is recessed (clear up to z 1.8)
+if (test=="velcro_groove_clear") intersection(){ bbL(); for (x0=[30,110], y=[20.5,93])
+  translate([x0+3, tray_d+y-7.5, 0]) cube([34, 15, 1.8]); }
+// the keystone's face-down perimeter is chamfered: nothing within 0.25 mm of the edge at y < 0.2
+if (test=="ks_face_chamfered") intersection(){ keystone(); difference(){
+  translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, 0.2, panel_h]);
+  translate([seam_l+ks_clr+0.25, -1, 0.25]) cube([key_w-2*ks_clr-0.5, 2, panel_h-0.5]); } }
 

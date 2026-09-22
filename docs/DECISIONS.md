@@ -25,6 +25,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
 | 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
 | 2026-09-22 | Ear bolts: square nut, no washer (D29). |
+| 2026-09-22 | Printability fixes from the H2D review (D30). |
 
 ---
 
@@ -488,4 +489,35 @@ Test: `m4_nut_cannot_spin` requires the nut's full turning circle to hit wall at
 seat. It gets 427 mm³ here. With the washer-height pocket it's 50 mm³, so that pocket
 would let the nut turn. The seated, insertable and past-travel checks now use the
 square nut. D22 marked partly superseded.
+
+### D30 — Printability fixes from the H2D review (2026-09-22, issue #15)
+Model changes from #15 that don't depend on a test print:
+
+- **Cable-floor ledges 6 → 8 mm.** The M3 pilot, centred in a 6 mm ledge, left
+  1.65 mm of plastic on the inboard side, likely to split as the screw self-taps. Now
+  2.65 mm each side. The void between the ledges drops to 17 mm, so the zip-tie slot
+  pairs move from ±8 to ±6 mm about the centre; `ziptie_void` still passes.
+- **Plenum and velcro slots no longer touch.** The plenum slot (y 2–10) and the front
+  velcro slots (then y 10–26) met at y = 10, the same "two voids touching" defect as
+  D19. That left the bay's front edge as two thin ribs, and it's the edge that bears
+  on the tray. The front velcro row moves to y = 20.5, leaving 2.5 mm of rib to the
+  plenum and 2.5 mm to the vent grid.
+- **Velcro strap path recessed.** The zip-tie anchors got underside grooves in D23;
+  the velcro slots didn't, so a strap under the floor stood ~1.5–2 mm below the shelf
+  into the inter-U gap. Each slot pair is now joined by a 16 × 2 mm underside groove.
+  Printed floor-down, that's a 16 mm bridge.
+- **Keystone panel chamfer and clearance.** The panel prints face-down, and first-layer
+  flare (0.1–0.25 mm per side) ate most of the 0.3 mm side clearance and narrowed the
+  aperture fronts where the couplers enter. A 0.5 mm 45° chamfer round the face-down
+  perimeter and both apertures (`ks_chamfer`) removes the flare, and `ks_clr` goes
+  0.3 → 0.5. The braces (D27) move in with the panel edge and still clear the latch
+  zone.
+
+**Waiting on data:**
+- **Horizontal pilot size (2.7 → 2.9 or teardrop):** waits for a test print.
+- **Solid runners in the floor vents under the machines' feet:** waits for the actual
+  foot positions.
+
+New tests: `bb_plenum_velcro_rib`, `velcro_groove_clear` and `ks_face_chamfered` all
+fail on the previous geometry and pass now.
 
