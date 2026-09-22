@@ -62,8 +62,9 @@ history, so the first commit is v3.1 (tagged `v3.1`) and the earlier versions su
 only in [docs/DECISIONS.md](docs/DECISIONS.md). Development continues here with Claude
 Code; later delivered designs get their own tags. **Run
 `bash tests/run.sh` after changing any parameter** — it checks every part pair on
-both sides for collisions, that each machine still slides out, and that screw holes
-still line up.
+both sides for collisions, that each machine still slides out, that screw holes
+still line up, and that each part prints in its exported orientation with no overhang
+beyond the known bridges and the features listed as needing support.
 
 Questions and test-fit results are best as GitHub issues, one per topic, with photos
 where relevant.

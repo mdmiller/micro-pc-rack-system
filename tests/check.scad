@@ -132,3 +132,50 @@ if (test=="ks_face_chamfered") intersection(){ keystone(); difference(){
   translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, 0.2, panel_h]);
   translate([seam_l+ks_clr+0.25, -1, 0.25]) cube([key_w-2*ks_clr-0.5, 2, panel_h-0.5]); } }
 
+// ---------------------------------------------------------------------------
+// Unsupported overhangs in print orientation (D31). Each part is sliced every
+// ov_dz; material not within 45 deg of the slice below is unsupported. An
+// opening of ov_open removes slivers narrower than 2*ov_open (the caps of small
+// horizontal holes, which bridge trivially). Each slice is extruded ov_h tall so
+// the runner's volume threshold sees small areas. Everything left must sit in
+// that part's allow-list: bridges that print as bridges, and the features that
+// need support in this orientation. A new overhang anywhere else fails.
+ov_dz = 0.4; ov_open = 1.3; ov_h = 5;
+module ovSlice(z) projection(cut=true) translate([0,0,-z]) children();
+module unsupported(H) for (i=[1:ceil(H/ov_dz)]) {
+  z = (i+0.5)*ov_dz;
+  translate([0,0,i*ov_dz]) linear_extrude(ov_h)
+    offset(r=ov_open) offset(delta=-ov_open)
+      difference(){ ovSlice(z) children(); offset(r=ov_dz+0.05) ovSlice(z-ov_dz) children(); }
+}
+ovH = [["tray_left",panel_h],["tray_right",panel_h],["keystone",key_w+2*wall_i],["brick_bay",32],
+       ["front_lip",lip_t],["rear_stop",stop_h],["tie_plate",flange_t],["cable_floor",cf_t]];
+function ovHeight(p) = ovH[search([p],ovH)[0]][1];
+// Allow-lists, in each part's print coordinates. Every box reaches ov_h + 1 above
+// its band so it covers the measuring extrusion.
+module ovTrayAllow() {                                   // left tray; mirrored for right
+  translate([bay_x0-1, -1, open_z1-1]) cube([bay_w+2, panel_t+2, panel_h-open_z1+ov_h+3]); // strip over the opening: NEEDS SUPPORT
+  for (z=brk_z, c=[0,1]) { y0 = ear_c0+c*brk_col_dy-ear_travel/2;                        // ear-bolt pocket + slot roofs: bridges
+    translate([-1, y0-(nut_s+nut_clr)/2-1, z]) cube([wall_o+2, ear_travel+nut_s+nut_clr+2, (nut_s+nut_clr)/2+ov_h+2]); }
+  for (i=[0:2]) translate([seam_l-wall_i-1, panel_t+55+i*42+15-16, wall_hi/2-1+11-5])     // inner-wall vent roofs: bridges
+    cube([wall_i+2, 32, 5+ov_h+2]);
+}
+module ovAllow(p) {
+  if (p=="tray_left")  ovTrayAllow();
+  if (p=="tray_right") translate([body_w,0,0]) mirror([1,0,0]) ovTrayAllow();
+  if (p=="keystone") for (x0=[-1, key_w+wall_i-ks_clr])                                   // flange wings: NEEDS SUPPORT
+    translate([x0, 0, panel_t-1]) cube([wall_i+ks_clr+1, panel_h, ov_h+3]);
+  if (p=="brick_bay") {
+    for (x0=[30,110], y=[20.5,93]) translate([x0-1, y-9, 1]) cube([42, 18, 1+ov_h+2]);    // velcro groove roofs: bridges
+    for (y=[30,60,90]) translate([169, y-3.5, 0.6]) cube([18, 7, 1+ov_h+2]);              // zip-tie groove roofs: bridges
+  }
+}
+module ovCheck(p) difference(){ unsupported(ovHeight(p)+1) printed(p); ovAllow(p); }
+for (p=["tray_left","tray_right","keystone","brick_bay","front_lip","rear_stop","tie_plate","cable_floor"])
+  if (test==str("ov_",p)) ovCheck(p);
+// control: with no allow-list the keystone's flange wings must be caught
+if (test=="ov_control_wings") unsupported(ovHeight("keystone")+1) printed("keystone");
+// debugging: -D 'test="ov_raw"' -D 'ov_part="brick_bay"' exports everything flagged
+ov_part = "tray_left";
+if (test=="ov_raw") unsupported(ovHeight(ov_part)+1) printed(ov_part);
+

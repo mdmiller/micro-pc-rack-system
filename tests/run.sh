@@ -18,7 +18,9 @@ stop_screws_L:zero stop_screws_R:zero keystone_side_clear:zero
 plug_vs_keystone:zero plug_vs_cf:zero plug_vs_plug:zero flange_over_relief:block
 ks_braces_present:block bb_braces_present_L:block ks_latch_room:zero bb_driver_clear_L:zero
 rack_width_margin:zero
-bb_plenum_velcro_rib:block velcro_groove_clear:zero ks_face_chamfered:zero"
+bb_plenum_velcro_rib:block velcro_groove_clear:zero ks_face_chamfered:zero
+ov_tray_left:zero ov_tray_right:zero ov_keystone:zero ov_brick_bay:zero ov_front_lip:zero
+ov_rear_stop:zero ov_tie_plate:zero ov_cable_floor:zero ov_control_wings:block"
 fail=0
 for t in $TESTS; do
   name=${t%%:*}; kind=${t##*:}

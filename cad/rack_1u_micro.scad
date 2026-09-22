@@ -364,13 +364,18 @@ module assembly() {
 }
 
 // ---------------------- render ----------------------
-if      (part=="none")       { }                 // used by tests/run.sh
-else if (part=="tray_left")  tray_left();
-else if (part=="tray_right") tray_right();
-else if (part=="keystone")   translate([-seam_l+wall_i, panel_h, 0]) rotate([90,0,0]) keystone();
-else if (part=="front_lip")  translate([0, lip_tab_h, 0]) rotate([90,0,0]) front_lip();  // flat, show face down
-else if (part=="rear_stop")  rear_stop();
-else if (part=="tie_plate")  tie_plate();
-else if (part=="cable_floor") cable_floor();
-else if (part=="brick_bay")  brick_bay();
-else                         assembly();
+// Each part in its print orientation. build.sh exports these; tests/run.sh
+// checks them for unsupported overhangs (D31).
+module printed(p) {
+  if      (p=="tray_left")   tray_left();
+  else if (p=="tray_right")  tray_right();
+  else if (p=="keystone")    translate([-seam_l+wall_i, panel_h, 0]) rotate([90,0,0]) keystone();
+  else if (p=="front_lip")   translate([0, lip_tab_h, 0]) rotate([90,0,0]) front_lip();  // face down
+  else if (p=="rear_stop")   rear_stop();
+  else if (p=="tie_plate")   tie_plate();
+  else if (p=="cable_floor") cable_floor();
+  else if (p=="brick_bay")   brick_bay();
+}
+if      (part=="none")     { }                 // used by tests/run.sh
+else if (part=="assembly") assembly();
+else                       printed(part);

@@ -26,6 +26,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
 | 2026-09-22 | Ear bolts: square nut, no washer (D29). |
 | 2026-09-22 | Printability fixes from the H2D review (D30). |
+| 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
 
 ---
 
@@ -520,4 +521,43 @@ Model changes from #15 that don't depend on a test print:
 
 New tests: `bb_plenum_velcro_rib`, `velcro_groove_clear` and `ks_face_chamfered` all
 fail on the previous geometry and pass now.
+
+### D31 — Test for unsupported overhangs in print orientation (2026-09-22, issue #15)
+#15's point 8: every check in `tests/run.sh` was solid-against-solid in the
+assembly, so nothing could see how a part prints. That's how the keystone flange
+wings, which start 6 mm above the bed with nothing under them, reached `main`. It's
+also how v3's floating brick-bay tab (D21) got through until someone counted shells.
+
+**The check.** Each part is taken in its exported orientation. A new `printed(p)`
+module holds the export transforms, shared by `build.sh` and the tests; the refactor
+leaves every STL byte-identical. The part is sliced every 0.4 mm, and material not
+within 45° of the slice below counts as unsupported. An opening of 1.3 mm removes
+slivers narrower than 2.6 mm: these are the caps of M3/M4 horizontal holes and
+countersinks, which bridge trivially. What remains must fall inside that part's
+**allow-list**:
+
+| Part | Allowed | Why |
+|---|---|---|
+| trays | strip above each PC opening | **needs support** |
+| trays | ear-bolt pocket and slot roofs, inner-wall vent roofs | bridges ≤ 30 mm |
+| keystone | the two flange wings | **needs support** |
+| brick bay | velcro and zip-tie groove roofs under the floor | bridges ≤ 16 mm |
+| all others | nothing | |
+
+So a new overhang fails unless someone decides it's a bridge or that it needs support,
+and adds it to the list. The allow-list boxes are derived from the same parameters as the features,
+so they move with the geometry.
+
+**Controls.**
+- `ov_control_wings` runs the keystone with no allow-list and must catch the wings
+  (227 mm³).
+- Restoring v3.1's floating tab in a scratch copy makes `ov_brick_bay` fail at exactly
+  the tab (x 195–203, z 8).
+
+**Scope.** This is a geometry check: which features bridge and which need support.
+How to support them is a slicer decision and lives in the 3MF, not the repo.
+
+**Limits.** It judges geometry, not a slicer. The 45° rule and the 2.6 mm sliver
+filter are approximations; bridge quality, sag and first-layer flare aren't modelled.
+Adds ~2 s to the suite.
 
