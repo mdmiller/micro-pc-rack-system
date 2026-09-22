@@ -22,15 +22,14 @@ module lipRods(x0){ for(h=[lip_edge, lip_len-lip_edge])
 // voids modelled as solids, so void-vs-void contact can be measured
 module outerPilot(){ translate([lip_scr_x[0],-eps,lip_scr_z]) rotate([-90,0,0]) cylinder(d=d_pilot,h=ear_y_min-1); }
 module openingAboveLip(){ translate([bay_x0,-10,floor_t+lip_h]) cube([bay_w,10,dev_h]); }
-// M4 x 12 button head on the 1.5 mm steel web: shank x -1.5..10.5, washer
-// 6.5..7.3, nut 7.3..10.5. 'ins' sweeps washer and nut in from the bay, which is
-// the only way they can get there. Checked at both ends of travel, all 4 holes.
+// M4 x 12 button head on the 1.5 mm steel web: shank x -1.5..10.5, square nut
+// (DIN 557) skin_t..skin_t+nut_m. 'ins' sweeps the nut in from the bay, which is
+// the only way it can get there. Checked at both ends of travel, all 4 holes.
 module xcyl(d,x0,x1,fn=40){ translate([x0,0,0]) rotate([0,90,0]) cylinder(d=d,h=x1-x0,$fn=fn); }
+module sqnut(x0) translate([x0, -nut_s/2, -nut_s/2]) cube([nut_m, nut_s, nut_s]);
 module m4hw(ins){
   xcyl(4,-brk_t,-brk_t+12);
-  if (ins) { hull(){ xcyl(9,skin_t,skin_t+0.8); xcyl(9,wall_o+2,wall_o+2.8); }
-             hull(){ xcyl(8.08,skin_t+0.8,skin_t+4,6); xcyl(8.08,wall_o+2,wall_o+5.2,6); } }
-  else { xcyl(9,skin_t,skin_t+0.8); xcyl(8.08,skin_t+0.8,skin_t+4,6); }
+  if (ins) hull(){ sqnut(skin_t); sqnut(wall_o+2); } else sqnut(skin_t);
 }
 module m4all(ins,past=0){ for(z=brk_z, c=[0,1], e=[-1,1])
   translate([0, ear_c0+c*brk_col_dy+e*(ear_travel/2+past), z]) m4hw(ins); }
@@ -59,6 +58,10 @@ if (test=="lip_clear_of_face")intersection(){ lipL(); openingAboveLip(); }
 if (test=="m4_hw_seated")     intersection(){ tray_left(); m4all(false); }
 if (test=="m4_hw_insertable") intersection(){ tray_left(); m4all(true); }
 if (test=="m4_past_travel")   intersection(){ tray_left(); m4all(false, 4); } // must hit
+// the nut can't spin: its full turning circle (the 9.9 mm diagonal) must hit wall
+module nutSpin() for(z=brk_z, c=[0,1], e=[-1,1])
+  translate([skin_t, ear_c0+c*brk_col_dy+e*ear_travel/2, z]) rotate([0,90,0]) cylinder(d=nut_s*sqrt(2), h=nut_m);
+if (test=="m4_nut_cannot_spin") intersection(){ tray_left(); nutSpin(); }
 // the brick bay's inner mounting tab must reach the floor (it once floated 4 mm above it)
 module innerTabRoot(){ translate([seam_l-wall_i, tray_d, floor_t+1]) cube([wall_i, 4, 8-(floor_t+1)]); }
 if (test=="bb_tab_rooted_L")  intersection(){ bbL(); innerTabRoot(); }

@@ -46,8 +46,10 @@ flange_t = 3;
 flange_l = 30;
 
 /* [M4 ear bolts] */
-wsh_d    = 9.0;   // M4 washer (DIN 125); the pocket is sized to it
-skin_t   = 6.5;   // solid outer skin the bolt passes through
+nut_s    = 7.0;   // M4 square nut (DIN 557) across flats; the pocket is sized to it
+nut_m    = 3.2;   // nut thickness
+nut_clr  = 0.4;   // pocket clearance over nut_s; the diagonal (9.9) can't turn in it
+skin_t   = 7.3;   // solid outer skin the bolt passes through
 bolt_slot = 4.5;  // M4 clearance slot height
 ear_c0   = 22;    // first bracket hole column at mid-travel, from the rack face
 ear_travel = 16;  // fore-aft adjustment of the shelf against the bracket
@@ -132,18 +134,18 @@ module yprism(x,z,len) { translate([x,-eps,z]) rotate([-90,0,0]) linear_extrude(
 // =====================================================================
 //  TRAY
 // =====================================================================
-// One pocket per bracket hole, open to the bay: washer and nut go in from
+// One pocket per bracket hole, open to the bay: a square nut slides in from
 // inside before the PC does, the bolt comes in from outside through the slot.
-// Every roof is a short bridge. The washer spreads the clamp load off the
-// thin strips of skin either side of the slot.
-ear_y_min = ear_c0 - ear_travel/2 - wsh_d/2 - 0.3;   // front edge of the front pockets
+// The pocket is nut-height, so the nut's 9.9 mm diagonal can't turn in it; it
+// only slides fore-aft with the travel. Every roof is a short bridge. (D29)
+ear_y_min = ear_c0 - ear_travel/2 - (nut_s+nut_clr)/2;   // front edge of the front pockets
 module ear_pockets() {
   for (z = brk_z, c = [0,1]) {
     y0 = ear_c0 + c*brk_col_dy - ear_travel/2;
     translate([-1, y0-bolt_slot/2, z-bolt_slot/2])
       cube([skin_t+1+eps, ear_travel+bolt_slot, bolt_slot]);            // bolt slot
-    translate([skin_t, y0-wsh_d/2-0.3, z-(wsh_d+0.3)/2])
-      cube([wall_o-skin_t+1, ear_travel+wsh_d+0.6, wsh_d+0.3]);         // washer + nut
+    translate([skin_t, y0-(nut_s+nut_clr)/2, z-(nut_s+nut_clr)/2])
+      cube([wall_o-skin_t+1, ear_travel+nut_s+nut_clr, nut_s+nut_clr]); // square nut
   }
 }
 

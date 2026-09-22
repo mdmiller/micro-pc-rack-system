@@ -10,7 +10,7 @@ tray_stop_L:zero tray_stop_R:zero trays_tie:zero tray_bricks_L:zero tray_bricks_
 tray_device_L:zero tray_device_R:zero tray_tray:zero keystone_tie:zero
 pullout_L:zero pullout_R:zero lip_blocks_L:block lip_blocks_R:block
 lip_holes_L:zero lip_holes_R:zero pilot_vs_pocket:zero lip_clear_of_face:zero
-m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block
+m4_hw_seated:zero m4_hw_insertable:zero m4_past_travel:block m4_nut_cannot_spin:block
 bb_tab_rooted_L:block
 tray_cf:zero keystone_cf:zero tie_cf:zero bricks_cf:zero cf_holes:zero ziptie_void:zero
 rear_face_open_L:zero stop_meets_face_L:block

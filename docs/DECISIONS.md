@@ -24,6 +24,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-21 | Rear video plug clearance: slim HDMI or mini-DP, flange relief, cable floor moved back (D26). |
 | 2026-09-21 | Keystone panel and brick bay tabs braced (D27). |
 | 2026-09-21 | Rack opening measured at 450.85 mm; keystone column narrowed to 33 mm (D28). |
+| 2026-09-22 | Ear bolts: square nut, no washer (D29). |
 
 ---
 
@@ -102,6 +103,7 @@ Consequences: outer wall 11 mm; M4 × 8 **button head** (a longer bolt bottoms o
 a socket head fouls the rail); body 442 mm, leaving 2.5 mm per side in a 450 mm
 opening. **Correction (D28):** that counted the steel but not the bolt heads. Verified: an M4 hex nut seats in the channel and the bolt clears.
 **Superseded by D22:** the nuts could never be loaded into the channels.
+
 
 ### D10 — Centre tie at front and rear
 Keystone module (front) and tie plate (rear) both bolt across the two inner walls.
@@ -246,6 +248,7 @@ and a part that falls apart into two bodies doesn't collide with anything. New t
 v3.1 and passes now.
 
 ### D22 — Ear nut channels couldn't be loaded; replaced with per-bolt pockets (2026-09-21)
+*Washer and hex nut replaced by a square nut in D29.*
 D9's channels were sealed at both ends. They run y 8–165 inside a wall that runs
 6–206, so the "slide the nuts in from the rear" step had 41 mm of solid wall in the way.
 The only opening was the 4.8 mm bolt slot on the outside face. A 7 mm nut passes that
@@ -446,4 +449,43 @@ floor: at 32 the braces cut into the latch clearance.
 `rack_open` and `rack_margin` now live in the source. The new test
 `rack_width_margin` models the heads at every bolt and fails if they come within
 2 mm of the rails; it fails at 36 (461 mm³ outside the margin) and passes at 33.
+
+### D29 — Ear bolts: square nut, no washer (2026-09-22, issue #15)
+D22's pocket was sized for a 9 mm washer, which made it taller than the hex nut's
+8.1 mm corners. That caused two problems:
+- The nut spun freely. The only way to hold it was a fingertip; a spanner can't get
+  around a nut inside a 9.3 mm pocket.
+- The pocket had 0.3 mm of clearance over the washer. Layer quantisation and roof sag
+  (#15) could close that up, so the washer might not go in at all.
+
+A square nut in the same washer pocket doesn't fully fix it. Its 9.9 mm diagonal lets
+it turn 23–37° before jamming corner-first into printed plastic, depending on the
+printed pocket height. And the window between "washer won't fit" and "nut spins
+freely" is only ~0.7 mm.
+
+Chosen: **square M4 nut (DIN 557), no washer, pocket sized to the nut** (7.4 mm tall,
+`nut_clr` 0.4). In that pocket the nut can turn about 2.5° before it locks, and it
+still slides fore-aft with the ±8 mm travel.
+
+**What dropping the washer costs.** Once the 4.5 mm slot band is taken out, the nut's
+face bears on less plastic:
+
+| Nut bearing on plastic | Area | Stress at ~0.5 N·m |
+|---|---|---|
+| washer (D22) | ~25 mm² | — |
+| **square nut** | **~17.5 mm²** | ~36 MPa |
+| hex nut | ~11.9 mm² | ~52 MPa |
+
+Among the no-washer options the square nut is clearly better: the hex nut is already
+around PETG's crush strength at snug. Dropping the washer also frees 0.8 mm, so the
+solid skin goes from 6.5 to 7.3 mm, which helps pull-through and the slot edges' bearing
+against the bolt. M4 × 12 still lands flush with the nut face, 0.5 mm short of the bay.
+
+**Assembly note.** BUILD.md now says "snug, not hard". The joint's load is the bolt
+shanks bearing on the slot edges, not clamp force.
+
+Test: `m4_nut_cannot_spin` requires the nut's full turning circle to hit wall at every
+seat. It gets 427 mm³ here. With the washer-height pocket it's 50 mm³, so that pocket
+would let the nut turn. The seated, insertable and past-travel checks now use the
+square nut. D22 marked partly superseded.
 

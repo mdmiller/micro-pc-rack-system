@@ -42,8 +42,7 @@ about creep in a warm rack over months, not about strength.
 **Rack mounting**
 - 2 × steel 1U rack ear brackets (Penn-Elcom R1206/1U or equivalent, ~$5.50 each)
 - 8 × M4 × 12 button head — anything taller than a button head fouls the rail
-- 8 × M4 hex nuts (7.0 mm across flats, 3.2 thick — standard DIN 934)
-- 8 × M4 washers (9 mm OD, 0.8 thick — standard DIN 125)
+- 8 × M4 **square** nuts (7.0 mm across flats, 3.2 thick — standard DIN 557). No washers.
 - 4 × rack screws + cage nuts for the brackets themselves
 
 **Assembly**
@@ -74,14 +73,18 @@ about creep in a warm rack over months, not about strength.
 
 Each outer wall has four pockets, one per bracket hole, at z = 9.7 and 33.5 mm to match
 the bracket's two hole rows (9.4 mm up from the bracket's bottom edge, 23.8 mm apart) and
-110 mm apart front to back. Each pocket opens into the bay: drop a washer and nut in from
+110 mm apart front to back. Each pocket opens into the bay: slide a square nut in from
 inside, then bolt through the bracket's Ø4.8 hole from outside. An M4 × 12 lands flush
 with the nut face and stops 0.5 mm short of the bay.
 
 The bolt passes through a slot rather than a hole, giving ±8 mm of fore-aft travel. The
 bracket's hole column position doesn't need to be exact, and you can slide the shelf to
-set how far it sits proud of the rack face. The pocket is sized for the washer, so the
-nut can turn: hold it with a finger or a 7 mm spanner while you tighten.
+set how far it sits proud of the rack face. The pocket is only 0.4 mm taller than the
+nut, so the nut slides along the slot but can't turn: no tool needed on the inside.
+
+Tighten **snug, not hard.** The nut bears on the strips of plastic either side of the
+slot, and those crush long before an M4 is at full torque. The joint doesn't need clamp
+force: the shelf's weight is carried by the bolt shanks bearing on the slot edges.
 
 ## Assembly
 
@@ -92,7 +95,7 @@ the U above blocks access from the top.
 1. Fit the keystone couplers first. Lay the keystone module face-down on a flat surface
    and press the couplers in until they click. Once installed, the panel hangs from its
    top edge only, so don't push couplers into it afterwards.
-2. Drop a washer then a nut into each of the four pockets in each tray's outer wall, from
+2. Slide a square nut into each of the four pockets in each tray's outer wall, from
    inside the bay, and bolt the steel ears on loosely.
 3. Drop the keystone module between the two tray fronts; screw its top flange into both
    inner walls. Fit the tie plate at the rear the same way.
@@ -100,8 +103,7 @@ the U above blocks access from the top.
    it down (6 screws, all reachable from above).
 5. Bolt a brick bay to the rear of each tray (2 screws each, from inside the bay).
 6. Set the depth: slide the shelf along the bracket slots until its front sits where you
-   want it relative to the ear legs, then tighten all eight M4s, holding each nut from
-   inside the bay.
+   want it relative to the ear legs, then tighten all eight M4s snug.
 7. Set the rear stops: slide each machine in from the front, push its rear stop forward
    against the bottom of the rear face, tighten, then slide the machine back out.
 8. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
