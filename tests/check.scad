@@ -3,7 +3,8 @@
 include <../cad/rack_1u_micro.scad>
 test = "";
 
-module dev(x0){ translate([x0+fit,panel_t,floor_t]) cube([dev_w,dev_d,dev_h]); }
+// Machines sit where the front lip holds them: front face at y = 0 (D32).
+module dev(x0){ translate([x0+fit,0,floor_t]) cube([dev_w,dev_d,dev_h]); }
 module devL(){ dev(bay_x0); }
 module devR(){ dev(body_w-bay_x0-bay_w); }
 module corrL(){ hull(){ devL(); translate([0,-260,0]) devL(); } }   // pull-out path
@@ -11,8 +12,8 @@ module corrR(){ hull(){ devR(); translate([0,-260,0]) devR(); } }
 lipLx = lip_x0;  lipRx = body_w - lip_x0 - lip_len;
 module lipL(){ translate([lipLx,-lip_t,floor_t]) front_lip(); }
 module lipR(){ translate([lipRx,-lip_t,floor_t]) front_lip(); }
-module stopL(){ translate([bay_cx-ret_w/2,panel_t+dev_d,floor_t+pad_t]) rear_stop(); }
-module stopR(){ translate([body_w-bay_cx-ret_w/2,panel_t+dev_d,floor_t+pad_t]) rear_stop(); }
+module stopL(d=dev_d){ translate([bay_cx-ret_w/2,d,floor_t+pad_t]) rear_stop(); }
+module stopR(d=dev_d){ translate([body_w-bay_cx-ret_w/2,d,floor_t+pad_t]) rear_stop(); }
 module tieP(){ translate([seam_l-wall_i,tray_d-30,wall_hi]) tie_plate(); }
 module bbL(){ translate([0,tray_d,0]) brick_bay(); }
 module bbR(){ translate([body_w,tray_d,0]) mirror([1,0,0]) brick_bay(); }
@@ -70,8 +71,8 @@ module cfP(){ translate([seam_l+0.3,cf_y0,ledge_h]) cable_floor(); }
 module cfRods(){ for(x=[seam_l+ledge_w/2, seam_r-ledge_w/2], y=cf_scr_y)      // M3 x 6 cores
   translate([x,y,ledge_h+cf_t-6]) cylinder(d=2.6,h=6); }
 module zipVoid(){ translate([seam_l+ledge_w+0.5,cf_y0,0]) cube([key_w-2*ledge_w-1,tray_d-cf_y0,ledge_h]); }
-module rearFaceAbove(){ translate([bay_x0+fit,panel_t+dev_d,floor_t+stop_h]) cube([dev_w,1,dev_h-stop_h]); }
-module rearFaceBand(){  translate([bay_x0+fit,panel_t+dev_d,floor_t]) cube([dev_w,1,stop_h]); }
+module rearFaceAbove(){ translate([bay_x0+fit,dev_d,floor_t+stop_h]) cube([dev_w,1,dev_h-stop_h]); }
+module rearFaceBand(){  translate([bay_x0+fit,dev_d,floor_t]) cube([dev_w,1,stop_h]); }
 if (test=="tray_cf")          intersection(){ union(){ tray_left(); tray_right(); } cfP(); }
 if (test=="keystone_cf")      intersection(){ keystone(); cfP(); }
 if (test=="tie_cf")           intersection(){ tieP(); cfP(); }
@@ -178,4 +179,23 @@ if (test=="ov_control_wings") unsupported(ovHeight("keystone")+1) printed("keyst
 // debugging: -D 'test="ov_raw"' -D 'ov_part="brick_bay"' exports everything flagged
 ov_part = "tray_left";
 if (test=="ov_raw") unsupported(ovHeight(ov_part)+1) printed(ov_part);
+
+// ---------------------------------------------------------------------------
+// D32
+// The rear stop must set snug against every machine in dev_depths: with the stop's
+// face at that depth, an M3 through each pad pilot must pass cleanly through its slot.
+module stopPilotRods() for (dx=[-20,20]) translate([bay_cx+dx, ret_y, 0]) cylinder(d=3.0, h=20);
+for (k=[0:len(dev_depths)-1])
+  if (test==str("stop_reaches_", k)) intersection(){ stopL(dev_depths[k]); stopPilotRods(); }
+// Front lip screws: M3 x 12 pan heads on the lip face, 2.6 mm cores (+0.5 margin) must
+// sit inside the tray pilots without reaching their bottoms.
+module lipScrews(x0) for(h=[lip_edge, lip_len-lip_edge])
+  translate([x0+h,-lip_t,lip_scr_z]) rotate([-90,0,0]) cylinder(d=2.6,h=12.5);
+if (test=="lip_screws_L") intersection(){ tray_left();  lipScrews(lipLx); }
+if (test=="lip_screws_R") intersection(){ tray_right(); lipScrews(lipRx); }
+// Floor vents: the top edge of every cell is chamfered (a 1 mm ring just below the
+// top face, outside each cell, must be clear).
+module ventRing() for (i=[0:vent_n[0]-1], j=[0:vent_n[1]-1])
+  translate([0,0,floor_t-0.3]) linear_extrude(0.3) difference(){ vent_cell(i,j,1.0); vent_cell(i,j); }
+if (test=="vents_chamfered") intersection(){ tray_left(); ventRing(); }
 
