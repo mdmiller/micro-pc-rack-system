@@ -28,6 +28,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-22 | Printability fixes from the H2D review (D30). |
 | 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
 | 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
+| 2026-09-25 | Both bricks calipered, smaller than D15 assumed in every axis; strap row moved so it holds them (D33). |
 | 2026-09-23 | Rear stop reaches the Dell, stiffer front lip, chamfered floor vents (D32). |
 
 ---
@@ -163,7 +164,9 @@ lengthwise would have needed ~190 mm of depth. Overall depth ~316 mm. The Lenovo
 never over. DC leads run forward through the 36 mm centre gap between the two bays.
 *Corrected since: the bay floor is 4 mm, so headroom is ~5.5 mm, and a strap does pass
 over the brick (D24). DC leads only run forward to each machine's own jack; the centre
-gap carries the video leads (D23).*
+gap carries the video leads (D23). Both bricks were calipered on 2026-09-25 and are
+smaller in every axis: Lenovo 65 W slim 107 × 46 × 29, Dell 90 W 128 × 66 × 23. Headroom
+over the Lenovo is ~11 mm, not ~5.5, and the pair uses ~365 mm of width (D33).*
 
 ### D16 — Thermal risk, accepted and partly de-risked
 Both machines exhaust rearward toward the bricks. Mitigations: ~29 mm plenum, vented
@@ -351,6 +354,7 @@ Found by working through every screw (reach, length, engagement), every assembly
 - **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
   headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
   That corrects D15.
+  *Since measured (D33): the Lenovo brick is 29 mm thick, so headroom is ~11 mm.*
 
 New tests:
 - `stop_screws_L` / `_R`: fail on v3.1, pass now.
@@ -515,7 +519,7 @@ Model changes from #15 that don't depend on a test print:
   velcro slots (then y 10–26) met at y = 10, the same "two voids touching" defect as
   D19. That left the bay's front edge as two thin ribs, and it's the edge that bears
   on the tray. The front velcro row moves to y = 20.5, leaving 2.5 mm of rib to the
-  plenum and 2.5 mm to the vent grid.
+  plenum and 2.5 mm to the vent grid. *Since replaced by a single row at y = 48 (D33).*
 - **Velcro strap path recessed.** The zip-tie anchors got underside grooves in D23;
   the velcro slots didn't, so a strap under the floor stood ~1.5–2 mm below the shelf
   into the inter-U gap. Each slot pair is now joined by a 16 × 2 mm underside groove.
@@ -610,3 +614,47 @@ the positions are measured. The 10 mm ribs keep a 7 mm flat top.
 **Not changed:** the Lenovo's side play (179 mm in a 184 mm bay). Nobody has asked for
 it tightened; D3 describes the per-tray `dev_w` route if that changes.
 
+### D33 — Bricks calipered; one strap row, centred on them (2026-09-25)
+**Measurements.** Both bricks were calipered. D15's figures were over in every axis:
+
+| Brick | D15 | Calipered |
+|---|---|---|
+| Lenovo 65 W slim | 112 × 51 × 35 | **107 × 46 × 29** |
+| Dell 90 W | 130 × 70 × 28 | **128 × 66 × 23** |
+
+They're now in the source as `bricks`, so the tests can use them. Nothing in the bay
+depended on the bricks being larger: `bb_depth` stays at 90 (66 is needed), and D6's
+loads assumed heavier bricks than these. Two things do change:
+
+- **Headroom.** 44.45 − 4 (bay floor) − 29 = ~11 mm over the Lenovo, not ~5.5. The
+  "room for a strap over the top, nothing more" warning in BUILD.md and D24 goes.
+- **The strap rows couldn't hold the Lenovo.** The slot rows at y = 20.5 and 93 (bands
+  12.5–28.5 and 85–101) need a brick at least 59 mm deep to sit under both. With the
+  brick's front edge 25 mm back, as BUILD.md asks, the front band overlapped the Lenovo
+  by 3.5 mm and the rear band not at all; the Dell got 3.5 and 6 mm. A 16 mm strap with
+  3.5 mm of brick under it slips off the edge. The measured widths (46, 66) made this
+  worse, but the rows were already wrong at 51 and 70.
+
+**Fix.** One slot row at y = 48 (`strap_y`), centred on the Lenovo's 25–71 and inside
+the Dell's 25–91 with ≥ 15 mm to spare each side. Each brick gets two loops, through
+the (30, 70) and (110, 150) slot pairs, each pair with its underside groove: four
+straps, which is what the BOM always said. The row also locates the bricks: a strap
+over the brick puts its front edge at `bb_clear` = 25, the plug clearance BUILD.md
+used to ask for by hand.
+
+The vent grid moves out of the strap band: a 22 mm row ahead of it (y 15–37) and a
+38 mm row behind (59–97), still three cells wide (`vent_rows`). Open area per bay goes
+from 5280 to 7200 mm², and no strap crosses a vent. The rib between the plenum slot and
+the front vent row is 5 mm; between the plenum and the strap slots, 30.
+
+**Not changed:** the slot pitch. For the Lenovo (x 12–119) the second loop's inner
+slot at x = 110 sits 9 mm inside the brick's end, so that strap comes up under the
+brick and over its end rather than beside it. It still cinches, and threading the straps
+before the bricks go in was already the order in BUILD.md.
+
+**Tests**, one per entry in `bricks`: `brick_in_bay_i` (the brick, front edge at
+`bb_clear`, clears the bay's lips and the tray) and `strap_under_brick_i` (the 16 mm
+strap band falls wholly inside the brick's footprint). At the old rows the Lenovo check
+fails with 2538 mm³ (front row) and 3248 mm³ (rear row: the entire band); at y = 48
+it's zero. The D30 velcro checks and the D31 overhang allow-list now read the strap
+parameters instead of literals.
