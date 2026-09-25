@@ -122,12 +122,22 @@ module outsideEnvelope(){ half=rack_open/2-rack_margin;
   translate([body_w/2-half-50,-10,-10]) cube([50,260,70]); translate([body_w/2+half,-10,-10]) cube([50,260,70]); }
 if (test=="rack_width_margin") intersection(){ union(){ tray_left(); tray_right(); earHeads(); } outsideEnvelope(); }
 // #15 fixes (D30)
-// plastic between the plenum slot and the front velcro slots must be solid
-if (test=="bb_plenum_velcro_rib") intersection(){ bbL(); for (x=[30,70,110,150])
+// plastic between the plenum slot and the strap slots must be solid
+if (test=="bb_plenum_velcro_rib") intersection(){ bbL(); for (x=strap_x)
   translate([x-2.5, tray_d+10, 0]) cube([5, 2.5, floor_t+1]); }
 // the velcro strap path under the floor is recessed (clear up to z 1.8)
-if (test=="velcro_groove_clear") intersection(){ bbL(); for (x0=[30,110], y=[20.5,93])
-  translate([x0+3, tray_d+y-7.5, 0]) cube([34, 15, 1.8]); }
+if (test=="velcro_groove_clear") intersection(){ bbL(); for (x0=[strap_x[0],strap_x[2]])
+  translate([x0+3, tray_d+strap_y-strap_w/2+0.5, 0]) cube([strap_loop-6, strap_w-1, 1.8]); }
+// Bricks (D33): each brick, laid crosswise with its front edge bb_clear back, must
+// clear the bay's lips, and the strap band must fall wholly within its footprint
+// (the strap goes over the brick, so a band past its edge holds nothing).
+module brick(i) translate([wall_o+1, tray_d+bb_clear, floor_t+1]) cube(bricks[i]);
+module strapBand() translate([0, tray_d+strap_y-strap_w/2, floor_t+1]) cube([seam_l, strap_w, 1]);
+for (i=[0:len(bricks)-1]) {
+  if (test==str("brick_in_bay_",i))     intersection(){ union(){ bbL(); tray_left(); } brick(i); }
+  if (test==str("strap_under_brick_",i)) difference(){ strapBand();
+    translate([-1, tray_d+bb_clear, floor_t]) cube([seam_l+2, bricks[i][1], 3]); }
+}
 // the keystone's face-down perimeter is chamfered: nothing within 0.25 mm of the edge at y < 0.2
 if (test=="ks_face_chamfered") intersection(){ keystone(); difference(){
   translate([seam_l+ks_clr, 0, 0]) cube([key_w-2*ks_clr, 0.2, panel_h]);
@@ -167,7 +177,8 @@ module ovAllow(p) {
   if (p=="keystone") for (x0=[-1, key_w+wall_i-ks_clr])                                   // flange wings: NEEDS SUPPORT
     translate([x0, 0, panel_t-1]) cube([wall_i+ks_clr+1, panel_h, ov_h+3]);
   if (p=="brick_bay") {
-    for (x0=[30,110], y=[20.5,93]) translate([x0-1, y-9, 1]) cube([42, 18, 1+ov_h+2]);    // velcro groove roofs: bridges
+    for (x0=[strap_x[0],strap_x[2]]) translate([x0-1, strap_y-strap_w/2-1, 1])            // velcro groove roofs: bridges
+      cube([strap_loop+2, strap_w+2, 1+ov_h+2]);
     for (y=[30,60,90]) translate([169, y-3.5, 0.6]) cube([18, 7, 1+ov_h+2]);              // zip-tie groove roofs: bridges
   }
 }

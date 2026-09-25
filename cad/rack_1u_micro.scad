@@ -91,6 +91,19 @@ bb_front = 12;    // open plenum slot at the front of the module
 bb_depth = 90;
 bb_rear  = 8;
 bb_lip   = 12;
+bb_clear = 25;    // bay depth kept clear behind the machines' rear plugs; the
+                  // bricks' front edges sit here, located by the strap row
+
+/* [Bricks] — calipered 2026-09-25 (D33); L x W x T, laid crosswise so W runs
+   front to back and T stands up */
+bricks   = [[107, 46, 29],   // Lenovo 65 W slim
+            [128, 66, 23]];  // Dell 90 W
+strap_w  = 16;               // velcro strap width; the slots and grooves fit it
+strap_y  = 48;               // one slot row, centred on the narrower brick
+strap_x  = [30, 70, 110, 150]; // two loops per brick, (30,70) and (110,150)
+strap_loop = 40;             // slot pitch of a loop; the groove runs between them
+vent_rows = [[15, 22], [59, 38]]; // bay-y start and height of each vent row:
+                                  // ahead of and behind the strap row
 
 /* [Hardware] */
 d_pilot = 2.7;
@@ -334,13 +347,13 @@ module brick_bay() {
         polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
-    for (x=[30,70,110,150], y=[20.5, 93])                    // velcro strap slots, 2.5 mm
-      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2); // clear of the plenum slot
-    for (x0=[30,110], y=[20.5, 93])                          // strap recessed under the
-      translate([x0, y-8, -eps]) cube([40, 16, 2+eps]);      // floor between each slot pair
-    for (i=[0:2], j=[0:1])                                   // vent grid
-      translate([wall_o+26+i*52, 42+j*30, -eps])
-        linear_extrude(floor_t+2) rr(40,22,4);
+    for (x=strap_x)                                          // velcro strap slots, one
+      translate([x, strap_y, -eps]) linear_extrude(floor_t+2) rr(5,strap_w,2); // row (D33)
+    for (x0=[strap_x[0], strap_x[2]])                        // strap recessed under the
+      translate([x0, strap_y-strap_w/2, -eps]) cube([strap_loop, strap_w, 2+eps]); // floor
+    for (i=[0:2], r=vent_rows)                               // vent grid: a row each side
+      translate([wall_o+26+i*52, r[0]+r[1]/2, -eps])         // of the strap row
+        linear_extrude(floor_t+2) rr(40,r[1],4);
     for (x=[wall_o/2, seam_l-wall_i/2])                      // tray bolt holes
       translate([x,-eps,20]) rotate([-90,0,0]) cylinder(d=d_free,h=6);
     translate([15, bb_d-bb_rear-eps, 3]) cube([30, bb_rear+2, bb_lip]); // cord notch

@@ -19,6 +19,7 @@ plug_vs_keystone:zero plug_vs_cf:zero plug_vs_plug:zero flange_over_relief:block
 ks_braces_present:block bb_braces_present_L:block ks_latch_room:zero bb_driver_clear_L:zero
 rack_width_margin:zero
 bb_plenum_velcro_rib:block velcro_groove_clear:zero ks_face_chamfered:zero
+brick_in_bay_0:zero brick_in_bay_1:zero strap_under_brick_0:zero strap_under_brick_1:zero
 ov_tray_left:zero ov_tray_right:zero ov_keystone:zero ov_brick_bay:zero ov_front_lip:zero
 ov_rear_stop:zero ov_tie_plate:zero ov_cable_floor:zero ov_control_wings:block
 stop_reaches_0:zero stop_reaches_1:zero lip_screws_L:zero lip_screws_R:zero vents_chamfered:zero"

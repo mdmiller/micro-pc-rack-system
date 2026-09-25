@@ -65,7 +65,8 @@ about creep in a warm rack over months, not about strength.
   Standard-head HDMI or DP plugs (~21 mm) collide with each other and with the keystone
   flange. A standard HDMI plug fits only in the **lower** jack, with a mini-DP above it,
   and then the cable floor has to start at ~85–90 mm (`cf_y0`). See D26.
-- 4 × velcro straps for the power bricks
+- 4 × velcro straps, 16 mm wide and at least 250 mm long, for the power bricks (two
+  loops per brick)
 - Small zip ties (up to 4 mm wide) for the DC and video leads
 
 ## The ear bolts
@@ -105,9 +106,11 @@ the U above blocks access from the top.
    want it relative to the ear legs, then tighten all eight M4s snug.
 7. Set the rear stops: slide each machine in from the front, push its rear stop forward
    against the bottom of the rear face, tighten, then slide the machine back out.
-8. Bricks go in crosswise with their mains-cord ends facing outboard, DC ends toward the
-   centre. Keep the front ~25 mm of the bay clear for the machines' rear plugs. The velcro
-   straps pass under the bay floor and over the brick. Thread them now.
+8. Thread the four velcro straps first: each goes down through one slot of a pair, along
+   the groove under the floor, and up through the other, so two loops wait in each bay.
+   Bricks go in crosswise on top of them, mains-cord ends outboard, DC ends toward the
+   centre. The strap row sets each brick's front edge ~25 mm back from the bay front,
+   which keeps that space clear for the machines' rear plugs. Cinch the straps.
 9. Plug the video leads into the backs of the couplers (reachable only from above), run
    them back along the cable floor and through the centre gap, and zip-tie them to the
    slot pairs in the cable floor and the anchors along the inboard edge of each brick bay.
@@ -146,6 +149,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 | `cf_y0` | 50 | where the cable floor starts; the lower rear video plug's head has to clear it |
 | `ks_relief_d`, `ks_relief_w` | 1.0, 9 | relief in the keystone flange underside over the upper rear plug |
 | `ks_brace`, `ks_brace_w` | 12, 3.7 | keystone panel-to-flange braces; wider than 3.7 intrudes on latch travel |
+| `bricks` | 107 × 46 × 29, 128 × 66 × 23 | the power bricks, L × W × T (Lenovo 65 W slim, Dell 90 W); `tests/run.sh` checks each fits the bay and sits under the strap band |
+| `strap_y`, `bb_clear` | 48, 25 | the velcro slot row, and where it puts the bricks' front edges; move both for a much deeper brick |
 | `bb_brace`, `bb_brace_o` | 11, 4.5 | brick bay inner and outer tab braces; the inner one must stay below the M3 head at z 20 |
 | `brk_row_z`, `brk_row_dz` | 9.4, 23.8 | bracket hole rows — change these if your brackets measure differently |
 | `wall_o` | 11 | outer wall; must stay thick enough to hold the ear-bolt pockets |
@@ -165,8 +170,10 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
   front of the bay), an open vent grid under the bricks and an open rear, but two adapters sitting in
   a 1U exhaust stream is not a configuration I can promise runs cool. If it does run hot,
   the brick bays unbolt and move to their own U without touching anything else.
-- The Lenovo brick is 35 mm thick and sits on a 4 mm bay floor, leaving about 5.5 mm of
-  headroom in the U: room for a velcro strap over the top, nothing more.
+- The bays are laid out for the two calipered bricks (Lenovo 65 W slim 107 × 46 × 29 mm,
+  Dell 90 W 128 × 66 × 23; ~11 mm of headroom over the taller one). A different adapter
+  needs to be 31–77 mm front to back to sit under the strap band and inside the bay, and
+  under ~37 mm tall with a strap over it. Add it to `bricks` and `tests/run.sh` checks both.
 - Verified against the bracket drawing, not against a bracket in hand. Check the 23.8 mm
   row spacing (`brk_row_dz`) and the bend-to-first-hole distance (`ear_c0`) with calipers
   before printing both trays; each is a one-parameter fix.
