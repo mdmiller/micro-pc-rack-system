@@ -21,7 +21,7 @@ Source: `cad/rack_1u_micro.scad`. Pre-exported binary meshes in `stl/`; regenera
 | `brick_bay` | 2 | 203 × 110 × 32 mm |
 | `keystone` | 1 | 49 × 44 × 36 mm |
 | `rear_stop` | 2 | 64 × 26 × 5 mm |
-| `front_lip` | 2 | 202 × 11 × 3 mm — symmetric, same part both sides |
+| `front_lip` | 2 | 202 × 11 × 6 mm — symmetric, same part both sides |
 | `tie_plate` | 1 | 49 × 30 × 3 mm |
 | `cable_floor` | 1 | 32 × 172 × 3 mm |
 
@@ -50,7 +50,7 @@ about creep in a warm rack over months, not about strength.
 - 4 × M3 × 8 pan — rear stops
 - 4 × M3 × 16 pan — brick bays to trays
 - 6 × M3 × 6 pan — cable floor to ledges
-- 4 × M3 × 8 pan head — front lips
+- 4 × M3 × 12 pan head — front lips
 - All M3 threads directly into 2.7 mm printed pilots. No inserts anywhere.
 
 **Other**
@@ -141,6 +141,8 @@ openscad -o tray_left.stl -D 'part="tray_left"' cad/rack_1u_micro.scad
 |---|---|---|
 | `dev_w`, `dev_d`, `dev_h` | 182, 183, 36 | device envelope |
 | `stop_h` | 8 | how far up the rear face the rear stop reaches |
+| `dev_depths` | 178, 183 | machine depths the rear stop must reach (Dell 7060 Micro, Lenovo Tiny); the stop adjusts over 175.5–186.5 mm and `tests/run.sh` checks each |
+| `vent_chamfer` | 1.5 | 45° chamfer on the floor vents' top edges so rubber feet ride out instead of catching |
 | `cf_y0` | 50 | where the cable floor starts; the lower rear video plug's head has to clear it |
 | `ks_relief_d`, `ks_relief_w` | 1.0, 9 | relief in the keystone flange underside over the upper rear plug |
 | `ks_brace`, `ks_brace_w` | 12, 3.7 | keystone panel-to-flange braces; wider than 3.7 intrudes on latch travel |

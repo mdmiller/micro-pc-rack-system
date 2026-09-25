@@ -34,6 +34,7 @@ dev_w = 182;
 dev_d = 183;
 dev_h = 36;
 fit   = 1;
+dev_depths = [178, 183]; // machines the rear stop must reach: Dell 7060 Micro, Lenovo Tiny (D32)
 
 /* [Structure] */
 wall_o   = 11;    // outer wall — carries the M4 ear-bolt pockets
@@ -69,6 +70,9 @@ ks_brace   = 12;   // keystone panel-to-flange braces, leg length
 ks_brace_w = 3.7;  // each sits in the strip outside the jacks, clear of latch travel
 bb_brace   = 11;   // brick bay inner tab brace; tops out below the M3 head at z 20
 bb_brace_o = 4.5;  // brick bay outer tab brace, above the outer lip
+
+/* [Floor vents] */
+vent_chamfer = 1.5; // 45-deg top-edge chamfer so rubber feet ride out of the vents (D32)
 
 /* [Rear stop] */
 stop_h = 8;       // top of the stop face above the tray floor; the stop touches
@@ -113,11 +117,11 @@ open_z1 = floor_t + dev_h + 1.0;
 brk_z   = [for (r=[0,1]) (u_h-brk_h)/2 + brk_row_z + r*brk_row_dz];
 scr_y   = [panel_t+10, panel_t+24];
 tie_y   = [tray_d-22, tray_d-8];
-ret_y   = tray_d-6;
+ret_y   = tray_d-10;                 // stop reaches 175.5-186.5 mm deep machines (D32)
 ret_w   = 64;
 pad_y0  = tray_d-14;
 lip_h     = 5;                          // bar height across the opening
-lip_t     = 3;
+lip_t     = 6;                          // 6 deep: stiff to handle; M3 x 12 screws (D32)
 lip_tab_h = 11;                         // taller tabs over the two wall strips
 lip_tab_w = 8;
 lip_scr_x = [wall_o/2, seam_l-wall_i/2];// tray x of the two lip screws
@@ -151,14 +155,23 @@ module ear_pockets() {
   }
 }
 
-module floor_vents() {
-  nx=3; ny=4; rib=10;
+// Vent cell (i,j) in 2D; grow > 0 enlarges it (the top-edge chamfer, and the tests).
+vent_n = [3, 4];
+module vent_cell(i, j, grow=0) {
+  rib=10;
   x0=bay_x0+14; x1=bay_x0+bay_w-14;
   y0=panel_t+18; y1=panel_t+dev_d-18;
-  cw=((x1-x0)-(nx-1)*rib)/nx;  ch=((y1-y0)-(ny-1)*rib)/ny;
-  for (i=[0:nx-1], j=[0:ny-1])
-    translate([x0+i*(cw+rib)+cw/2, y0+j*(ch+rib)+ch/2, -eps])
-      linear_extrude(floor_t+2*eps) rr(cw,ch,3);
+  cw=((x1-x0)-(vent_n[0]-1)*rib)/vent_n[0];  ch=((y1-y0)-(vent_n[1]-1)*rib)/vent_n[1];
+  translate([x0+i*(cw+rib)+cw/2, y0+j*(ch+rib)+ch/2]) rr(cw+2*grow, ch+2*grow, 3+grow);
+}
+module floor_vents() {
+  for (i=[0:vent_n[0]-1], j=[0:vent_n[1]-1]) {
+    translate([0,0,-eps]) linear_extrude(floor_t+2*eps) vent_cell(i,j);
+    hull() {                                    // chamfer, per cell: a machine's feet
+      translate([0,0,floor_t-vent_chamfer]) linear_extrude(eps) vent_cell(i,j);  // ride
+      translate([0,0,floor_t]) linear_extrude(eps) vent_cell(i,j,vent_chamfer);  // out
+    }
+  }
 }
 
 module inner_wall_vents() {
@@ -342,7 +355,7 @@ module brick_bay() {
 // =====================================================================
 //  ASSEMBLY
 // =====================================================================
-module ghost(x0) { %translate([x0+fit, panel_t, floor_t]) cube([dev_w,dev_d,dev_h]); }
+module ghost(x0) { %translate([x0+fit, 0, floor_t]) cube([dev_w,dev_d,dev_h]); }  // against the lip
 module steel_ear(x, mir) {
   translate([x,0,(u_h-brk_h)/2]) mirror([mir,0,0]) %union() {
     cube([brk_t, brk_len, brk_h]);
@@ -354,7 +367,7 @@ module assembly() {
   translate([lip_x0, -lip_t, floor_t]) front_lip();
   translate([body_w-lip_x0-lip_len, -lip_t, floor_t]) front_lip();
   for (cx=[bay_cx, body_w-bay_cx])
-    translate([cx-ret_w/2, panel_t+dev_d, floor_t+pad_t]) rear_stop();
+    translate([cx-ret_w/2, dev_d, floor_t+pad_t]) rear_stop();
   translate([seam_l-wall_i, tray_d-30, wall_hi]) tie_plate();
   translate([seam_l+0.3, cf_y0, ledge_h]) cable_floor();
   translate([0,tray_d,0]) brick_bay();

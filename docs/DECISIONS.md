@@ -28,6 +28,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-22 | Printability fixes from the H2D review (D30). |
 | 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
 | 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
+| 2026-09-23 | Rear stop reaches the Dell, stiffer front lip, chamfered floor vents (D32). |
 
 ---
 
@@ -139,6 +140,8 @@ Two screws, lip off, machine slides out. Redesigned in v3.1 after defects were f
 Slotted for ±7 mm (172–186 mm device depth), with a 45° self-supporting hook over the
 case's rear top edge to stop lift. It's positioned at build time, not a service item.
 **Hook replaced by a low curb in D23.**
+*The ±7 mm / 172–186 mm figures were stale; the stop reached 179.5–190.5 mm, which missed
+the 178 mm Dell. Moved in D32 to 175.5–186.5 mm.*
 
 ---
 
@@ -570,4 +573,40 @@ How to support them is a slicer decision and lives in the 3MF, not the repo.
 **Limits.** It judges geometry, not a slicer. The 45° rule and the 2.6 mm sliver
 filter are approximations; bridge quality, sag and first-layer flare aren't modelled.
 Adds ~2 s to the suite.
+
+### D32 — Rear stop reach, stiffer front lip, chamfered floor vents (2026-09-23)
+**Rear stop reach.** With the front lip fitted, a machine sits with its front face flush
+with the panel front (y = 0), so the stop's face has to reach the machine's depth. Its
+slots only covered 179.5–190.5 mm. The Lenovo (183) was fine, but the Dell 7060 Micro
+(178) could never be set snug and kept ~1.5 mm of rattle. The tests missed it because
+they modelled the machine 6 mm back, at the panel's rear face. Moving the stop's
+pilots and pad 4 mm forward (`ret_y` = `tray_d` − 10) gives 175.5–186.5 mm, which
+covers both with ≥ 2 mm margin.
+
+The test machine envelope and the assembly now put the machine against the lip. New
+parameter `dev_depths` lists the machines, and `stop_reaches_*` checks that an M3
+through each pad pilot passes the stop's slot at every listed depth. At the old
+position the Dell check fails (22 mm³).
+
+**Stiffer front lip.** The lip was a 5 mm-tall, 3 mm-deep bar spanning ~194 mm between
+its screws, and it felt flimsy in the hand on a test print. As a retainer it was
+already adequate: a flat machine face bears near the lip's ends, where it's stiff,
+about 0.1 mm per N. But it bent and twisted easily when handled. It's now 6 mm deep
+(`lip_t`), about 8× stiffer in bending and far stiffer in torsion. Its height is
+unchanged, so it covers no more of the machine's face. It stands 6 mm proud of the
+panel instead of 3, and it still prints face-down.
+
+The lip screws become M3 × 12. New checks `lip_screws_L/R` confirm they seat in the
+tray pilots without bottoming out; M3 × 12 would have hit the pilot bottoms with the
+old 3 mm lip.
+
+**Chamfered floor vents.** A machine sliding in crosses four rows of vent openings on
+its rubber feet. #15 flagged that a foot can drop in and catch on a square edge. Each
+cell's top edge now has a 1.5 mm 45° chamfer (`vent_chamfer`), so a foot rides out.
+This needs no foot positions. Solid runners under the feet remain an option once
+the positions are measured. The 10 mm ribs keep a 7 mm flat top.
+`vents_chamfered` checks every cell; with no chamfer it fails.
+
+**Not changed:** the Lenovo's side play (179 mm in a 184 mm bay). Nobody has asked for
+it tightened; D3 describes the per-tray `dev_w` route if that changes.
 
