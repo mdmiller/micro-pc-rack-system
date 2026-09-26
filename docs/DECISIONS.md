@@ -28,7 +28,9 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-22 | Printability fixes from the H2D review (D30). |
 | 2026-09-22 | Tests check each part for unsupported overhangs in print orientation (D31). |
 | 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
+| 2026-09-25 | Both bricks calipered, smaller than D15 assumed in every axis; strap row moved so it holds them (D33). |
 | 2026-09-23 | Rear stop reaches the Dell, stiffer front lip, chamfered floor vents (D32). |
+| 2026-09-26 | Tray and brick bay print as one part; deep rear rib and a second tie plate cut the centre sag from ~10 mm to ~4 (D34). |
 
 ---
 
@@ -40,6 +42,7 @@ module. v1 put an 8 mm screw boss across the seam, pushing each tray to 219 mm �
 too close to a 220 mm bed — and was rejected before delivery. v2 moved to a top flange
 screwed into the inner walls (215 mm trays). v3 is 201 mm (203 in v3.1), because the steel ears
 (D8) remove the printed ear entirely.
+*Since D34 each tray includes its brick bay and is 211 × 316 mm; the 220 mm bed goal is dropped.*
 
 ### D2 — PC faces flush in full-width openings
 Each bay's front opening is the full bay width, so power buttons, front USB and jacks
@@ -111,6 +114,7 @@ opening. **Correction (D28):** that counted the steel but not the bolt heads. Ve
 
 ### D10 — Centre tie at front and rear
 Keystone module (front) and tie plate (rear) both bolt across the two inner walls.
+*D34 adds a second tie plate at the back of the brick bays.*
 Field evidence later confirmed this matters: users of the closest public design found
 it needs support in the centre once racked (see prior-art.md).
 
@@ -150,7 +154,7 @@ the 178 mm Dell. Moved in D32 to 175.5–186.5 mm.*
 ### D14 — Bricks on the same shelf, behind the PCs
 Not a separate U: the point of the design is density, and a U spent on power bricks
 is a U lost. The shelf mounts on the front rails only (requirement 8), so it grows
-rearward in a bolt-on bay rather than reaching for rear rails. D6 showed the extra
+rearward in a bolt-on bay (part of the tray since D34) rather than reaching for rear rails. D6 showed the extra
 moment is harmless. On a 4-post rack, rear support is an available fallback, but
 nothing in the design needs it.
 
@@ -163,12 +167,14 @@ lengthwise would have needed ~190 mm of depth. Overall depth ~316 mm. The Lenovo
 never over. DC leads run forward through the 36 mm centre gap between the two bays.
 *Corrected since: the bay floor is 4 mm, so headroom is ~5.5 mm, and a strap does pass
 over the brick (D24). DC leads only run forward to each machine's own jack; the centre
-gap carries the video leads (D23).*
+gap carries the video leads (D23). Both bricks were calipered on 2026-09-25 and are
+smaller in every axis: Lenovo 65 W slim 107 × 46 × 29, Dell 90 W 128 × 66 × 23. Headroom
+over the Lenovo is ~11 mm, not ~5.5, and the pair uses ~365 mm of width (D33).*
 
 ### D16 — Thermal risk, accepted and partly de-risked
 Both machines exhaust rearward toward the bricks. Mitigations: ~29 mm plenum, vented
 floor, open rear, and bays that unbolt so the bricks can move to their own U without
-touching anything else. Later evidence: the closest public design puts two PCs and
+touching anything else (*no longer: the bays are part of the trays, D34*). Later evidence: the closest public design puts two PCs and
 both bricks in 1U with the bricks directly behind, printed in PLA+, and months of
 use by several builders produced no heat or warping complaints. Still worth watching.
 *The plenum is now ~40 mm: the bricks sit behind the 25 mm kept clear for the machines'
@@ -179,7 +185,7 @@ load, in a rack with its own forced ventilation and an interior at or below abou
 40 °C (100 °F). Under those assumptions, going to 2U for thermal reasons was rejected
 as a waste of rack space, and the shelf has no fan of its own. If your rack is
 hotter, unventilated, or the machines run flat out, revisit this: the open rear
-leaves room to add a fan, and the brick bays unbolt.
+leaves room to add a fan.
 
 ---
 
@@ -243,6 +249,7 @@ shipped v3 and on a deliberately broken lip.
 **The v3 files shared before this repo existed have these defects. Use this repo.**
 
 ### D21 — Brick bay inner mounting tab floated above the floor (2026-09-21)
+*The tabs are gone since D34.*
 Found by counting connected solids in the exported mesh: `brick_bay` was two
 separate bodies. Both front mounting tabs started at z = 8. The outer one overlaps
 the outer lip beneath it (12 mm tall), so it was fused. The inner edge is the open
@@ -351,6 +358,7 @@ Found by working through every screw (reach, length, engagement), every assembly
 - **Headroom.** The bay floor is 4 mm, not 3, so the Lenovo brick gets about 5.5 mm of
   headroom, not 6.5. A velcro strap does pass over the brick: it has to, to hold it.
   That corrects D15.
+  *Since measured (D33): the Lenovo brick is 29 mm thick, so headroom is ~11 mm.*
 
 New tests:
 - `stop_screws_L` / `_R`: fail on v3.1, pass now.
@@ -408,6 +416,7 @@ coupler depths. The first two failed before this change. `flange_over_relief` ch
 that 2 mm of flange remains.
 
 ### D27 — Brace the keystone panel and the brick bay tabs (2026-09-21, issue #11)
+*The brick bay tabs and their braces are gone since D34.*
 Two parts behave like vertical posts loaded across their print layers. The numbers
 are hand calculations with rounded loads; the ratios are what matter.
 
@@ -515,7 +524,7 @@ Model changes from #15 that don't depend on a test print:
   velcro slots (then y 10–26) met at y = 10, the same "two voids touching" defect as
   D19. That left the bay's front edge as two thin ribs, and it's the edge that bears
   on the tray. The front velcro row moves to y = 20.5, leaving 2.5 mm of rib to the
-  plenum and 2.5 mm to the vent grid.
+  plenum and 2.5 mm to the vent grid. *Since replaced by a single row at y = 48 (D33).*
 - **Velcro strap path recessed.** The zip-tie anchors got underside grooves in D23;
   the velcro slots didn't, so a strap under the floor stood ~1.5–2 mm below the shelf
   into the inter-U gap. Each slot pair is now joined by a 16 × 2 mm underside groove.
@@ -610,3 +619,85 @@ the positions are measured. The 10 mm ribs keep a 7 mm flat top.
 **Not changed:** the Lenovo's side play (179 mm in a 184 mm bay). Nobody has asked for
 it tightened; D3 describes the per-tray `dev_w` route if that changes.
 
+### D33 — Bricks calipered; one strap row, centred on them (2026-09-25)
+**Measurements.** Both bricks were calipered. D15's figures were over in every axis:
+
+| Brick | D15 | Calipered |
+|---|---|---|
+| Lenovo 65 W slim | 112 × 51 × 35 | **107 × 46 × 29** |
+| Dell 90 W | 130 × 70 × 28 | **128 × 66 × 23** |
+
+They're now in the source as `bricks`, so the tests can use them. Nothing in the bay
+depended on the bricks being larger: `bb_depth` stays at 90 (66 is needed), and D6's
+loads assumed heavier bricks than these. Two things do change:
+
+- **Headroom.** 44.45 − 4 (bay floor) − 29 = ~11 mm over the Lenovo, not ~5.5. The
+  "room for a strap over the top, nothing more" warning in BUILD.md and D24 goes.
+- **The strap rows couldn't hold the Lenovo.** The slot rows at y = 20.5 and 93 (bands
+  12.5–28.5 and 85–101) need a brick at least 59 mm deep to sit under both. With the
+  brick's front edge 25 mm back, as BUILD.md asks, the front band overlapped the Lenovo
+  by 3.5 mm and the rear band not at all; the Dell got 3.5 and 6 mm. A 16 mm strap with
+  3.5 mm of brick under it slips off the edge. The measured widths (46, 66) made this
+  worse, but the rows were already wrong at 51 and 70.
+
+**Fix.** One slot row at y = 48 (`strap_y`), centred on the Lenovo's 25–71 and inside
+the Dell's 25–91 with ≥ 15 mm to spare each side. Each brick gets two loops, through
+the (30, 70) and (110, 150) slot pairs, each pair with its underside groove: four
+straps, which is what the BOM always said. The row also locates the bricks: a strap
+over the brick puts its front edge at `bb_clear` = 25, the plug clearance BUILD.md
+used to ask for by hand.
+
+The vent grid moves out of the strap band: a 22 mm row ahead of it (y 15–37) and a
+38 mm row behind (59–97), still three cells wide (`vent_rows`). Open area per bay goes
+from 5280 to 7200 mm², and no strap crosses a vent. The rib between the plenum slot and
+the front vent row is 5 mm; between the plenum and the strap slots, 30.
+
+**Not changed:** the slot pitch. For the Lenovo (x 12–119) the second loop's inner
+slot at x = 110 sits 9 mm inside the brick's end, so that strap comes up under the
+brick and over its end rather than beside it. It still cinches, and threading the straps
+before the bricks go in was already the order in BUILD.md.
+
+**Tests**, one per entry in `bricks`: `brick_in_bay_i` (the brick, front edge at
+`bb_clear`, clears the bay's lips and the tray) and `strap_under_brick_i` (the 16 mm
+strap band falls wholly inside the brick's footprint). At the old rows the Lenovo check
+fails with 2538 mm³ (front row) and 3248 mm³ (rear row: the entire band); at y = 48
+it's zero. The D30 velcro checks and the D31 overhang allow-list now read the strap
+parameters instead of literals.
+
+### D34 — One-piece trays with a stiff brick bay (2026-09-26)
+**Problem.** The shelf hangs from the ears on its outer walls. Only the trays' vented
+3 mm floors hold up the middle. A grillage model of one half-shelf (machine, brick and
+self-weight; tied at the keystone and tie plate; solid plastic, E = 2000 MPa) puts the
+seam **9.8 mm** low at the back of the PC bay and 7.6 mm at the keystone. Once the
+plastic creeps (E ≈ 900) that becomes **~22 mm**. Stress is only ~8 MPa, so the
+shortfall is stiffness, not strength. More tie plates at the front don't help: under
+symmetric load nothing crosses the seam, and the ties are already rigid.
+
+**Fix.** Each tray prints with its brick bay as one part. The bay becomes a frame that
+holds up the inner wall's rear end:
+- Both walls run the full 316 mm; the bolted joint and its tabs are gone.
+- A 16 × 39 mm rear rib replaces the 8 × 12 lip. Its depth does the work: it resists
+  twist, which stops the inner wall pivoting on the bay. With an 8 mm rib the keystone
+  still sagged ~6 mm.
+- A second tie plate (the same part) joins the two bays' inner walls at the rear.
+- A 35 × 20 mm window in the inner wall behind the machine takes the video leads, and a
+  30 × 20 mm hole in the rib takes the mains cords. Together they cost ~0.2 mm.
+
+| Worst sag | Before | After |
+|---|---|---|
+| Short-term | 9.8 mm (back of seam) | **3.8 mm** (keystone) |
+| After creep | ~22 mm | **~8 mm** |
+
+The rib takes 8 mm from the bricks' side of the bay (`bb_depth` 90 → 82). The Dell
+brick still has 3 mm behind it, and the rear vent row is now y 59–91.
+
+**Cost.** Each tray is 211 × 316 mm and needs a bed at least 320 mm on one axis
+(D1's 220 mm goal is dropped). The bays no longer unbolt (D16), and filament use rises
+by ~290 cm³, mostly for the rib. What's left is at the front, in the floor and the strip
+over the PC opening.
+
+**Tests.** The joint's checks go (`tray_bricks_*`, `bb_tab_rooted_L`,
+`bb_braces_present_L`, `bb_driver_clear_L`, `ov_brick_bay`). New: `tie_rear`,
+`tie_screws` (both tie plates' screws sit in their pilots), `rear_rib` and `bay_spine`
+(the rib, and the inner wall over the window, are present), `lead_window` and
+`cord_hole` (both are open). The tray's overhang allow-list gains the bay's bridges.

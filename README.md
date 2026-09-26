@@ -2,7 +2,7 @@
 
 3D-printable 19" rack mounting for 1-litre micro PCs. The current design is a 1U
 shelf holding two machines side by side, front-loading, with keystone jacks for
-console video at the front and a bolt-on bay for the power bricks at the rear.
+console video at the front and a bay for the power bricks at the rear of each tray.
 
 ![Assembled shelf](docs/preview.png)
 
