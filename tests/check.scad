@@ -15,8 +15,9 @@ module lipR(){ translate([lipRx,-lip_t,floor_t]) front_lip(); }
 module stopL(d=dev_d){ translate([bay_cx-ret_w/2,d,floor_t+pad_t]) rear_stop(); }
 module stopR(d=dev_d){ translate([body_w-bay_cx-ret_w/2,d,floor_t+pad_t]) rear_stop(); }
 module tieP(){ translate([seam_l-wall_i,tray_d-30,wall_hi]) tie_plate(); }
-module bbL(){ translate([0,tray_d,0]) brick_bay(); }
-module bbR(){ translate([body_w,tray_d,0]) mirror([1,0,0]) brick_bay(); }
+module tieRear(){ translate([seam_l-wall_i,tray_d+bb_d-30,wall_hi]) tie_plate(); }
+module bbL(){ translate([0,tray_d,0]) brick_bay(); }                      // rear section of
+module bbR(){ translate([body_w,tray_d,0]) mirror([1,0,0]) brick_bay(); } // each tray (D34)
 // thin rods down each lip hole *as placed*: they must pass cleanly into the pilots
 module lipRods(x0){ for(h=[lip_edge, lip_len-lip_edge])
   translate([x0+h,0.5,lip_scr_z]) rotate([-90,0,0]) cylinder(d=2.0,h=5); }
@@ -42,8 +43,6 @@ if (test=="tray_lip_R")       intersection(){ tray_right(); lipR(); }
 if (test=="tray_stop_L")      intersection(){ tray_left();  stopL(); }
 if (test=="tray_stop_R")      intersection(){ tray_right(); stopR(); }
 if (test=="trays_tie")        intersection(){ union(){ tray_left(); tray_right(); } tieP(); }
-if (test=="tray_bricks_L")    intersection(){ tray_left();  bbL(); }
-if (test=="tray_bricks_R")    intersection(){ tray_right(); bbR(); }
 if (test=="tray_device_L")    intersection(){ tray_left();  devL(); }
 if (test=="tray_device_R")    intersection(){ tray_right(); devR(); }
 if (test=="tray_tray")        intersection(){ tray_left();  tray_right(); }
@@ -63,9 +62,6 @@ if (test=="m4_past_travel")   intersection(){ tray_left(); m4all(false, 4); } //
 module nutSpin() for(z=brk_z, c=[0,1], e=[-1,1])
   translate([skin_t, ear_c0+c*brk_col_dy+e*ear_travel/2, z]) rotate([0,90,0]) cylinder(d=nut_s*sqrt(2), h=nut_m);
 if (test=="m4_nut_cannot_spin") intersection(){ tray_left(); nutSpin(); }
-// the brick bay's inner mounting tab must reach the floor (it once floated 4 mm above it)
-module innerTabRoot(){ translate([seam_l-wall_i, tray_d, floor_t+1]) cube([wall_i, 4, 8-(floor_t+1)]); }
-if (test=="bb_tab_rooted_L")  intersection(){ bbL(); innerTabRoot(); }
 // cable floor, rear stop band, zip-tie clearance
 module cfP(){ translate([seam_l+0.3,cf_y0,ledge_h]) cable_floor(); }
 module cfRods(){ for(x=[seam_l+ledge_w/2, seam_r-ledge_w/2], y=cf_scr_y)      // M3 x 6 cores
@@ -106,14 +102,8 @@ if (test=="flange_over_relief") intersection(){ keystone();
 // Braces (D27): present, and clear of latch travel and the bay screwdrivers
 if (test=="ks_braces_present")  intersection(){ keystone(); for (x0=[seam_l+ks_clr, seam_r-ks_clr-ks_brace_w])
   translate([x0, panel_t, wall_hi-8]) cube([ks_brace_w, 3, 8]); }
-if (test=="bb_braces_present_L") intersection(){ bbL(); union(){
-  translate([seam_l-wall_i, tray_d+4, floor_t+2]) cube([wall_i, 4, 5]);
-  translate([0, tray_d+4, bb_lip]) cube([wall_o, 2, 2]); } }
 module latchZone() for (zc=ks_z) translate([body_w/2-ks_w/2-2.5, panel_t, zc-ks_h/2]) cube([ks_w+5, 30, ks_h]);
 if (test=="ks_latch_room")      intersection(){ keystone(); latchZone(); }
-module bayDrivers() for (x=[wall_o/2, seam_l-wall_i/2])   // M3 pan head + screwdriver along y
-  translate([x, tray_d+4, 20]) rotate([-90,0,0]) cylinder(d=6, h=bb_d);
-if (test=="bb_driver_clear_L")  intersection(){ bbL(); bayDrivers(); }
 // Rack width (D28): with the steel webs and M4 button heads (ISO 7380: 7.6 mm x 2.2 mm)
 // fitted, the shelf must clear the measured rail opening by rack_margin each side.
 module earHeads(){ for (s=[0,1], z=brk_z, c=[0,1])
@@ -134,7 +124,7 @@ if (test=="velcro_groove_clear") intersection(){ bbL(); for (x0=[strap_x[0],stra
 module brick(i) translate([wall_o+1, tray_d+bb_clear, floor_t+1]) cube(bricks[i]);
 module strapBand() translate([0, tray_d+strap_y-strap_w/2, floor_t+1]) cube([seam_l, strap_w, 1]);
 for (i=[0:len(bricks)-1]) {
-  if (test==str("brick_in_bay_",i))     intersection(){ union(){ bbL(); tray_left(); } brick(i); }
+  if (test==str("brick_in_bay_",i))     intersection(){ tray_left(); brick(i); }
   if (test==str("strap_under_brick_",i)) difference(){ strapBand();
     translate([-1, tray_d+bb_clear, floor_t]) cube([seam_l+2, bricks[i][1], 3]); }
 }
@@ -159,7 +149,7 @@ module unsupported(H) for (i=[1:ceil(H/ov_dz)]) {
     offset(r=ov_open) offset(delta=-ov_open)
       difference(){ ovSlice(z) children(); offset(r=ov_dz+0.05) ovSlice(z-ov_dz) children(); }
 }
-ovH = [["tray_left",panel_h],["tray_right",panel_h],["keystone",key_w+2*wall_i],["brick_bay",32],
+ovH = [["tray_left",panel_h],["tray_right",panel_h],["keystone",key_w+2*wall_i],
        ["front_lip",lip_t],["rear_stop",stop_h],["tie_plate",flange_t],["cable_floor",cf_t]];
 function ovHeight(p) = ovH[search([p],ovH)[0]][1];
 // Allow-lists, in each part's print coordinates. Every box reaches ov_h + 1 above
@@ -170,24 +160,26 @@ module ovTrayAllow() {                                   // left tray; mirrored 
     translate([-1, y0-(nut_s+nut_clr)/2-1, z]) cube([wall_o+2, ear_travel+nut_s+nut_clr+2, (nut_s+nut_clr)/2+ov_h+2]); }
   for (i=[0:2]) translate([seam_l-wall_i-1, panel_t+55+i*42+15-16, wall_hi/2-1+11-5])     // inner-wall vent roofs: bridges
     cube([wall_i+2, 32, 5+ov_h+2]);
+  translate([0, tray_d, 0]) {                                                             // brick bay (D34):
+    for (x0=[strap_x[0],strap_x[2]]) translate([x0-1, strap_y-strap_w/2-1, 1])            // velcro groove roofs: bridges
+      cube([strap_loop+2, strap_w+2, 1+ov_h+2]);
+    for (y=[30,60,90]) translate([169, y-3.5, 0.6]) cube([18, 7, 1+ov_h+2]);              // zip-tie groove roofs: bridges
+    translate([seam_l-wall_i-1, lead_y[0]-1, floor_t+lead_h]) cube([wall_i+2, lead_y[1]-lead_y[0]+2, ov_h+3]); // lead window roof: bridge
+    translate([cord_x[0]-1, bb_d-bb_rear-1, floor_t+cord_h]) cube([cord_x[1]-cord_x[0]+2, bb_rear+2, ov_h+3]);  // cord hole roof: bridge
+  }
 }
 module ovAllow(p) {
   if (p=="tray_left")  ovTrayAllow();
   if (p=="tray_right") translate([body_w,0,0]) mirror([1,0,0]) ovTrayAllow();
   if (p=="keystone") for (x0=[-1, key_w+wall_i-ks_clr])                                   // flange wings: NEEDS SUPPORT
     translate([x0, 0, panel_t-1]) cube([wall_i+ks_clr+1, panel_h, ov_h+3]);
-  if (p=="brick_bay") {
-    for (x0=[strap_x[0],strap_x[2]]) translate([x0-1, strap_y-strap_w/2-1, 1])            // velcro groove roofs: bridges
-      cube([strap_loop+2, strap_w+2, 1+ov_h+2]);
-    for (y=[30,60,90]) translate([169, y-3.5, 0.6]) cube([18, 7, 1+ov_h+2]);              // zip-tie groove roofs: bridges
-  }
 }
 module ovCheck(p) difference(){ unsupported(ovHeight(p)+1) printed(p); ovAllow(p); }
-for (p=["tray_left","tray_right","keystone","brick_bay","front_lip","rear_stop","tie_plate","cable_floor"])
+for (p=["tray_left","tray_right","keystone","front_lip","rear_stop","tie_plate","cable_floor"])
   if (test==str("ov_",p)) ovCheck(p);
 // control: with no allow-list the keystone's flange wings must be caught
 if (test=="ov_control_wings") unsupported(ovHeight("keystone")+1) printed("keystone");
-// debugging: -D 'test="ov_raw"' -D 'ov_part="brick_bay"' exports everything flagged
+// debugging: -D 'test="ov_raw"' -D 'ov_part="tray_left"' exports everything flagged
 ov_part = "tray_left";
 if (test=="ov_raw") unsupported(ovHeight(ov_part)+1) printed(ov_part);
 
@@ -210,3 +202,21 @@ module ventRing() for (i=[0:vent_n[0]-1], j=[0:vent_n[1]-1])
   translate([0,0,floor_t-0.3]) linear_extrude(0.3) difference(){ vent_cell(i,j,1.0); vent_cell(i,j); }
 if (test=="vents_chamfered") intersection(){ tray_left(); ventRing(); }
 
+
+// ---------------------------------------------------------------------------
+// D34: tray and brick bay are one part. The stiffness comes from the bay's frame:
+// the rear rib at full depth and height, and the inner wall carried through over
+// the lead window. The rear tie plate must seat, and its M3 x 16 countersunk screws
+// (13 mm past the plate, 2.6 mm cores) must sit in the pilots without bottoming out.
+if (test=="tie_rear")     intersection(){ union(){ tray_left(); tray_right(); } tieRear(); }
+module tieScrews() for (y=concat(tie_y, [for (v=tie_yr) tray_d+v]), x=[seam_l-wall_i/2, seam_r+wall_i/2])
+  translate([x, y, wall_hi-13.5]) cylinder(d=2.6, h=13.5);
+if (test=="tie_screws")   intersection(){ union(){ tray_left(); tray_right(); } tieScrews(); }
+if (test=="rear_rib")     intersection(){ tray_left();
+  translate([cord_x[1]+2, tray_d+bb_d-bb_rear+0.5, floor_t+2]) cube([seam_l-wall_i-cord_x[1]-4, bb_rear-1, wall_hi-floor_t-3]); }
+if (test=="bay_spine")    intersection(){ tray_left();
+  translate([seam_l-wall_i+0.5, tray_d-10, floor_t+1+lead_h+1]) cube([wall_i-1, bb_d+10, wall_hi-floor_t-lead_h-3]); }
+if (test=="lead_window")  intersection(){ tray_left();
+  translate([seam_l-wall_i-1, tray_d+lead_y[0]+1, floor_t+2]) cube([wall_i+2, lead_y[1]-lead_y[0]-2, lead_h-2]); }
+if (test=="cord_hole")    intersection(){ tray_left();
+  translate([cord_x[0]+1, tray_d+bb_d-bb_rear-1, floor_t+2]) cube([cord_x[1]-cord_x[0]-2, bb_rear+2, cord_h-2]); }

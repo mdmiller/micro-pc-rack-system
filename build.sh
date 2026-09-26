@@ -13,7 +13,7 @@ if [ "$have" != "$OPENSCAD_VERSION" ]; then
   echo "         STLs may change in their triangles without any change in shape." >&2
 fi
 mkdir -p stl
-for p in tray_left tray_right keystone front_lip rear_stop tie_plate cable_floor brick_bay; do
+for p in tray_left tray_right keystone front_lip rear_stop tie_plate cable_floor; do
   echo "rendering $p"
   openscad --export-format binstl -o "stl/$p.stl" -D "part=\"$p\"" "$SRC"
 done
