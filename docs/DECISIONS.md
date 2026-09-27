@@ -30,6 +30,7 @@ the way are noted where they happened and collected under Corrections at the end
 | 2026-09-22 | Docs cleanup: stale statements corrected, preview re-rendered. |
 | 2026-09-25 | Both bricks calipered, smaller than D15 assumed in every axis; strap row moved so it holds them (D33). |
 | 2026-09-23 | Rear stop reaches the Dell, stiffer front lip, chamfered floor vents (D32). |
+| 2026-09-26 | Tray and brick bay print as one part, with a glued rear beam across both; centre sag from ~11 mm to ~2.9 (D34). |
 
 ---
 
@@ -41,6 +42,7 @@ module. v1 put an 8 mm screw boss across the seam, pushing each tray to 219 mm �
 too close to a 220 mm bed — and was rejected before delivery. v2 moved to a top flange
 screwed into the inner walls (215 mm trays). v3 is 201 mm (203 in v3.1), because the steel ears
 (D8) remove the printed ear entirely.
+*Since D34 each tray includes its brick bay and is 211 × 316 mm; the 220 mm bed goal is dropped.*
 
 ### D2 — PC faces flush in full-width openings
 Each bay's front opening is the full bay width, so power buttons, front USB and jacks
@@ -112,6 +114,7 @@ opening. **Correction (D28):** that counted the steel but not the bolt heads. Ve
 
 ### D10 — Centre tie at front and rear
 Keystone module (front) and tie plate (rear) both bolt across the two inner walls.
+*D34 adds a rear beam glued in across both trays.*
 Field evidence later confirmed this matters: users of the closest public design found
 it needs support in the centre once racked (see prior-art.md).
 
@@ -151,7 +154,7 @@ the 178 mm Dell. Moved in D32 to 175.5–186.5 mm.*
 ### D14 — Bricks on the same shelf, behind the PCs
 Not a separate U: the point of the design is density, and a U spent on power bricks
 is a U lost. The shelf mounts on the front rails only (requirement 8), so it grows
-rearward in a bolt-on bay rather than reaching for rear rails. D6 showed the extra
+rearward in a bolt-on bay (part of the tray since D34) rather than reaching for rear rails. D6 showed the extra
 moment is harmless. On a 4-post rack, rear support is an available fallback, but
 nothing in the design needs it.
 
@@ -171,7 +174,7 @@ over the Lenovo is ~11 mm, not ~5.5, and the pair uses ~365 mm of width (D33).*
 ### D16 — Thermal risk, accepted and partly de-risked
 Both machines exhaust rearward toward the bricks. Mitigations: ~29 mm plenum, vented
 floor, open rear, and bays that unbolt so the bricks can move to their own U without
-touching anything else. Later evidence: the closest public design puts two PCs and
+touching anything else (*no longer: the bays are part of the trays, D34*). Later evidence: the closest public design puts two PCs and
 both bricks in 1U with the bricks directly behind, printed in PLA+, and months of
 use by several builders produced no heat or warping complaints. Still worth watching.
 *The plenum is now ~40 mm: the bricks sit behind the 25 mm kept clear for the machines'
@@ -182,7 +185,7 @@ load, in a rack with its own forced ventilation and an interior at or below abou
 40 °C (100 °F). Under those assumptions, going to 2U for thermal reasons was rejected
 as a waste of rack space, and the shelf has no fan of its own. If your rack is
 hotter, unventilated, or the machines run flat out, revisit this: the open rear
-leaves room to add a fan, and the brick bays unbolt.
+leaves room to add a fan.
 
 ---
 
@@ -246,6 +249,7 @@ shipped v3 and on a deliberately broken lip.
 **The v3 files shared before this repo existed have these defects. Use this repo.**
 
 ### D21 — Brick bay inner mounting tab floated above the floor (2026-09-21)
+*The tabs are gone since D34.*
 Found by counting connected solids in the exported mesh: `brick_bay` was two
 separate bodies. Both front mounting tabs started at z = 8. The outer one overlaps
 the outer lip beneath it (12 mm tall), so it was fused. The inner edge is the open
@@ -412,6 +416,7 @@ coupler depths. The first two failed before this change. `flange_over_relief` ch
 that 2 mm of flange remains.
 
 ### D27 — Brace the keystone panel and the brick bay tabs (2026-09-21, issue #11)
+*The brick bay tabs and their braces are gone since D34.*
 Two parts behave like vertical posts loaded across their print layers. The numbers
 are hand calculations with rounded loads; the ratios are what matter.
 
@@ -658,3 +663,62 @@ strap band falls wholly inside the brick's footprint). At the old rows the Lenov
 fails with 2538 mm³ (front row) and 3248 mm³ (rear row: the entire band); at y = 48
 it's zero. The D30 velcro checks and the D31 overhang allow-list now read the strap
 parameters instead of literals.
+
+### D34 — One-piece trays and a glued rear beam (2026-09-26)
+**Problem.** The shelf hangs from the ears on its outer walls. Only the trays' vented
+3 mm floors hold up the middle. A grillage model of one half-shelf (machine, brick and
+self-weight; tied at the keystone and tie plate; solid plastic, E = 2000 MPa) puts the
+seam **11.4 mm** low, and **~25 mm** once the plastic creeps (E ≈ 900). Stress is only
+~8 MPa, so the shortfall is stiffness, not strength. More tie plates at the front don't
+help: the ties there are already rigid.
+
+**Fix.** Each tray prints with its brick bay as one part, and one `rear_beam`
+(417 × 16 × 33 mm) is glued in across the back of both:
+- The floor and outer wall run the full 316 mm. The inner wall stops 16 mm short, and
+  the beam sits in that strip: on the floors, between the outer walls, against the
+  inner walls' ends, glued to all three. The bolted tray-to-bay joint and its tabs are gone.
+- The beam is what does the work. Each inner wall carries most of the middle's load to
+  the rear. The beam, continuous across the centre, holds those ends up and stops them
+  tipping, and hands the load to the outer walls, which the ears hold. Two separate
+  ribs would hinge at the seam. A tie plate on top of the walls can't prevent that,
+  because nothing joins the walls at the bottom behind the cable floor.
+- A 35 × 20 mm window in the inner wall behind the machine takes the video leads.
+
+| Worst sag | Before | Separate 16 mm ribs | Continuous beam, 33 mm tall |
+|---|---|---|---|
+| Short-term | 11.4 mm | 4.2 mm | **2.9 mm** |
+| After creep | ~25 mm | ~9 mm | **~6.5 mm** |
+
+**Height.** The beam's top is level with the tallest brick, 33 mm (`rb_top`). The
+machines exhaust rearward, and their rear cables and the mains cords come in over the
+back (D16, D23). So the rear has to stay open above the beam: 11 mm to the U above,
+where the bricks already leave that much. At the full 39 mm wall height the beam would
+be ~10% stiffer (2.6 / 5.8 mm) but leave a 5 mm slot; at 24 mm it leaves 20 mm and
+sags 3.8 / 8.5 mm. A 32 mm-deep beam would halve the sag, but it needs 16 mm more shelf
+depth or less room for the bricks. The worst point is now the keystone.
+
+The beam takes 8 mm from the bricks' side of the bay (`bb_depth` 90 → 82). The Dell
+brick still has 3 mm behind it, and the rear vent row is now y 59–91.
+
+**Printing the beam.** It prints top-down along the plate diagonal, ~8 mm clear of the
+325 × 320 single-nozzle edges. Its top edges and the bottom of the centre section, which
+drops into the gap between the trays, are chamfered 0.6 mm to keep elephant's foot on
+either part out of the joints.
+
+**Cost.** Each tray is 211 × 316 mm and needs a bed at least 320 mm on one axis (D1's
+220 mm goal is dropped). Once glued, the shelf is one permanent unit, and the bays no
+longer unbolt (D16). Filament rises by ~270 cm³.
+
+**Tests.** The joint's checks go (`tray_bricks_*`, `bb_tab_rooted_L`,
+`bb_braces_present_L`, `bb_driver_clear_L`, `ov_brick_bay`). New:
+- `tray_rear_beam`: the beam clears the trays.
+- `rear_beam_glue`, `rear_beam_on_floor` and `rear_beam_located`: it bears on the inner
+  walls' ends, on the floors and on the outer walls.
+- `rear_beam_span`: it runs unbroken across the centre.
+- `rear_beam_fits_bed`: it fits the diagonal with 2 mm to spare.
+- `ov_rear_beam`: no unsupported overhangs top-down.
+- `tie_screws`: the tie plate's screws sit in their pilots.
+- `bay_spine`: the inner wall over the window is present.
+- `lead_window`: open.
+- `rear_open`: nothing stands above the beam across the rear, between the outer walls.
+- `brick_in_bay_i` now counts the beam as well as the tray.
