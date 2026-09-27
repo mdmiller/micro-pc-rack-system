@@ -1,7 +1,7 @@
 // =====================================================================
 //  MODULAR 19" MICRO-PC RACK SYSTEM  —  v3
 //  1U shelf: two 1-litre micro PCs, front-loading, stacked keystone bay,
-//  bolt-on rear power-brick bay.  Mounts on steel rack ears
+//  power bricks in each tray's rear section.  Mounts on steel rack ears
 //  (Penn-Elcom R1206/1U or equivalent) — no printed ear.
 //
 //  x = 0 at the left rail face, y = 0 at the rack face, z = 0 at the
@@ -12,7 +12,7 @@
 // =====================================================================
 
 /* [Part to render] */
-part = "tray_left"; // [tray_left,tray_right,keystone,front_lip,rear_stop,tie_plate,cable_floor,brick_bay,assembly]
+part = "tray_left"; // [tray_left,tray_right,keystone,front_lip,rear_stop,tie_plate,cable_floor,rear_beam,assembly]
 show_devices = true;
 
 /* [Rack + steel bracket] */
@@ -68,8 +68,6 @@ ks_relief_w = 9;    // so a slim (16 mm) HDMI head clears it — D26
 /* [Braces] — D27 */
 ks_brace   = 12;   // keystone panel-to-flange braces, leg length
 ks_brace_w = 3.7;  // each sits in the strip outside the jacks, clear of latch travel
-bb_brace   = 11;   // brick bay inner tab brace; tops out below the M3 head at z 20
-bb_brace_o = 4.5;  // brick bay outer tab brace, above the outer lip
 
 /* [Floor vents] */
 vent_chamfer = 1.5; // 45-deg top-edge chamfer so rubber feet ride out of the vents (D32)
@@ -86,11 +84,29 @@ ledge_w = 8;      // ledge on each inner wall that carries the cable floor (2.65
                   // of plastic either side of its M3 pilot, D30)
 ledge_h = 4;      // also the zip-tie clearance under the floor
 
-/* [Brick bay] */
-bb_front = 12;    // open plenum slot at the front of the module
-bb_depth = 90;
-bb_rear  = 8;
-bb_lip   = 12;
+/* [Brick bay] — the rear section of each tray (D34) */
+bb_front = 12;    // open plenum slot at the front of the bay
+bb_depth = 82;
+bb_rear  = 16;    // rear strip of the bay, where the rear beam sits (D34)
+lead_y   = [4, 39]; // window in the inner wall for the video leads, from the bay front
+lead_h   = 20;
+
+/* [Rear beam] — one piece across both trays' rear strips, glued in (D34) */
+rb_clr  = 0.2;    // glue gap at each end, against the outer walls
+rb_foot = 0.6;    // chamfers that keep elephant's foot out of the glue joints
+bb_clear = 25;    // bay depth kept clear behind the machines' rear plugs; the
+                  // bricks' front edges sit here, located by the strap row
+
+/* [Bricks] — calipered 2026-09-25 (D33); L x W x T, laid crosswise so W runs
+   front to back and T stands up */
+bricks   = [[107, 46, 29],   // Lenovo 65 W slim
+            [128, 66, 23]];  // Dell 90 W
+strap_w  = 16;               // velcro strap width; the slots and grooves fit it
+strap_y  = 48;               // one slot row, centred on the narrower brick
+strap_x  = [30, 70, 110, 150]; // two loops per brick, (30,70) and (110,150)
+strap_loop = 40;             // slot pitch of a loop; the groove runs between them
+vent_rows = [[15, 22], [59, 32]]; // bay-y start and height of each vent row:
+                                  // ahead of and behind the strap row
 
 /* [Hardware] */
 d_pilot = 2.7;
@@ -180,7 +196,9 @@ module inner_wall_vents() {
       rotate([0,90,0]) linear_extrude(wall_i+14, center=true) rr(22,30,4);
 }
 
-module tray_left() {
+module tray_left() { tray_front(); translate([0, tray_d, 0]) brick_bay(); }  // one part (D34)
+
+module tray_front() {
   difference() {
     union() {
       cube([seam_l, panel_t, panel_h]);                                  // panel
@@ -204,8 +222,6 @@ module tray_left() {
       translate([seam_l-wall_i/2, y, wall_hi-16]) cylinder(d=d_pilot, h=17);
     for (dx=[-20,20])                                                    // rear stop
       translate([bay_cx+dx, ret_y, 0.6]) cylinder(d=d_pilot, h=floor_t+pad_t);  // M3 x 8 tip clears
-    for (x=[wall_o/2, seam_l-wall_i/2])                                  // brick-bay pilots
-      translate([x, tray_d-14, 20]) rotate([-90,0,0]) cylinder(d=d_pilot, h=15);
     for (y=cf_scr_y)                                                     // cable floor
       translate([seam_l+ledge_w/2, y, 0.4]) cylinder(d=d_pilot, h=ledge_h);
     floor_vents();
@@ -317,37 +333,54 @@ module cable_floor() {
 }
 
 // =====================================================================
-//  BRICK BAY MODULE  (one per side; the centre gap is the cable run)
+//  BRICK BAY  (rear section of each tray, printed with it; D34). The floor
+//  and outer wall run to the back edge; the inner wall stops at the rear
+//  beam, which is glued in across both trays.
 // =====================================================================
 module brick_bay() {
   difference() {
     union() {
-      cube([seam_l, bb_d, floor_t+1]);                       // floor
-      cube([wall_o, bb_d, bb_lip]);                          // outer lip
-      translate([0, bb_d-bb_rear, 0]) cube([seam_l, bb_rear, bb_lip]);  // rear lip
-      for (x=[0, seam_l-wall_i])                             // front mounting tabs
-        translate([x, 0, 0]) cube([x==0?wall_o:wall_i, 4, 32]); // from the floor: the
-                                                               // inner edge has no lip
-      translate([seam_l-wall_i,0,0]) rotate([90,0,90]) linear_extrude(wall_i)   // tab braces
-        polygon([[4,floor_t+1],[4,floor_t+1+bb_brace],[4+bb_brace,floor_t+1]]);
-      rotate([90,0,90]) linear_extrude(wall_o)
-        polygon([[4,bb_lip],[4,bb_lip+bb_brace_o],[4+bb_brace_o,bb_lip]]);
+      cube([seam_l, bb_d, floor_t+1]);                              // floor
+      cube([wall_o, bb_d, wall_ho]);                                // outer wall
+      translate([seam_l-wall_i, 0, 0]) cube([wall_i, bb_d-bb_rear, wall_hi]); // inner wall, stops
     }
     translate([wall_o+8, 2, -eps]) cube([seam_l-wall_o-30, bb_front-4, floor_t+2]); // plenum slot
-    for (x=[30,70,110,150], y=[20.5, 93])                    // velcro strap slots, 2.5 mm
-      translate([x, y, -eps]) linear_extrude(floor_t+2) rr(5,16,2); // clear of the plenum slot
-    for (x0=[30,110], y=[20.5, 93])                          // strap recessed under the
-      translate([x0, y-8, -eps]) cube([40, 16, 2+eps]);      // floor between each slot pair
-    for (i=[0:2], j=[0:1])                                   // vent grid
-      translate([wall_o+26+i*52, 42+j*30, -eps])
-        linear_extrude(floor_t+2) rr(40,22,4);
-    for (x=[wall_o/2, seam_l-wall_i/2])                      // tray bolt holes
-      translate([x,-eps,20]) rotate([-90,0,0]) cylinder(d=d_free,h=6);
-    translate([15, bb_d-bb_rear-eps, 3]) cube([30, bb_rear+2, bb_lip]); // cord notch
+    for (x=strap_x)                                          // velcro strap slots, one
+      translate([x, strap_y, -eps]) linear_extrude(floor_t+2) rr(5,strap_w,2); // row (D33)
+    for (x0=[strap_x[0], strap_x[2]])                        // strap recessed under the
+      translate([x0, strap_y-strap_w/2, -eps]) cube([strap_loop, strap_w, 2+eps]); // floor
+    for (i=[0:2], r=vent_rows)                               // vent grid: a row each side
+      translate([wall_o+26+i*52, r[0]+r[1]/2, -eps])         // of the strap row
+        linear_extrude(floor_t+2) rr(40,r[1],4);
+    translate([seam_l-wall_i-1, lead_y[0], floor_t+1])       // video-lead window
+      cube([wall_i+2, lead_y[1]-lead_y[0], lead_h]);
     for (y=[30,60,90]) {                                     // zip-tie anchors: slot
       for (x=[170,186])                                      // pairs, strap recessed
         translate([x, y, -eps]) linear_extrude(floor_t+2) square([2.2,5],center=true);
       translate([170, y-2.5, -eps]) cube([16, 5, 1.6]);      // in an underside groove
+    }
+  }
+}
+
+// =====================================================================
+//  REAR BEAM  (one piece across both trays; D34). Sits on the floors between
+//  the outer walls, against the inner walls' ends, and is glued to all three;
+//  continuous across the centre, it stops the trays sagging at the seam.
+// =====================================================================
+rb_x   = [wall_o+rb_clr, body_w-wall_o-rb_clr];
+rb_top = floor_t + 1 + max([for (b=bricks) b[2]]);  // level with the tallest brick: the rear
+                                                     // stays open above it for air and cables
+module rear_beam() {
+  difference() {
+    union() {
+      intersection() {                                          // on the floors; top edges
+        translate([rb_x[0], 0, floor_t+1]) cube([rb_x[1]-rb_x[0], bb_rear, rb_top-floor_t-1]);
+        hull() { translate([rb_x[0], 0, 0]) cube([rb_x[1]-rb_x[0], bb_rear, rb_top-rb_foot]);  // chamfered:
+                 translate([rb_x[0]+rb_foot, rb_foot, 0]) cube([rb_x[1]-rb_x[0]-2*rb_foot, bb_rear-2*rb_foot, rb_top]); } // it prints top-down
+      }
+      hull() {                                                  // down into the centre gap,
+        translate([seam_l+rb_clr+rb_foot, 0, 0]) cube([key_w-2*rb_clr-2*rb_foot, bb_rear, eps]); // clear of
+        translate([seam_l+rb_clr, 0, rb_foot]) cube([key_w-2*rb_clr, bb_rear, floor_t+2-rb_foot]); } // the floors' foot
     }
   }
 }
@@ -369,9 +402,8 @@ module assembly() {
   for (cx=[bay_cx, body_w-bay_cx])
     translate([cx-ret_w/2, dev_d, floor_t+pad_t]) rear_stop();
   translate([seam_l-wall_i, tray_d-30, wall_hi]) tie_plate();
+  translate([0, tray_d+bb_d-bb_rear, 0]) rear_beam();
   translate([seam_l+0.3, cf_y0, ledge_h]) cable_floor();
-  translate([0,tray_d,0]) brick_bay();
-  translate([body_w,tray_d,0]) mirror([1,0,0]) brick_bay();
   steel_ear(-brk_t,0); steel_ear(body_w+brk_t,1);
   if (show_devices) { ghost(bay_x0); ghost(body_w-bay_x0-bay_w); }
 }
@@ -387,7 +419,7 @@ module printed(p) {
   else if (p=="rear_stop")   rear_stop();
   else if (p=="tie_plate")   tie_plate();
   else if (p=="cable_floor") cable_floor();
-  else if (p=="brick_bay")   brick_bay();
+  else if (p=="rear_beam")   translate([0,0,rb_top]) mirror([0,0,1]) rear_beam();  // top down; lay it along the plate diagonal
 }
 if      (part=="none")     { }                 // used by tests/run.sh
 else if (part=="assembly") assembly();
